@@ -1,5 +1,7 @@
 # Getting Started with Create React App
 
+Single Page Application using the React library to power a clothing e-commerce site.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
