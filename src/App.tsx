@@ -4,18 +4,30 @@ import HomePage from "./pages/homepage/HomePage";
 import Shop from "./pages/shop/Shop";
 import Header from "./components/header/Header";
 import SignInAndSignOut from "./pages/sign/SignInAndSingOut";
-import { auth } from "./firebase/firebase.utils";
-import firebase from "firebase/compat";
+import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
+import { CurrentUser } from "./components/types";
 
 import "./App.css";
 
 const App: React.FC = () => {
-  const [currentUser, setCurrentUser] = useState<firebase.User | null>(null);
+  const [currentUser, setCurrentUser] = useState<CurrentUser>(null);
 
   useEffect(() => {
-    const unsubscribeFromAuth = auth.onAuthStateChanged(user => {
-      setCurrentUser(user);
-      console.log(user);
+    const unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
+      if (userAuth) {
+        const userRef = await createUserProfileDocument(userAuth);
+
+        if (userRef) {
+          userRef.onSnapshot(snapShot => {
+            setCurrentUser({
+              id: snapShot.id,
+              ...snapShot.data(),
+            });
+          });
+        }
+      } else {
+        setCurrentUser(null);
+      }
     });
 
     return () => {
