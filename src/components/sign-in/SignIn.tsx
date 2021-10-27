@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { FormEvent, useState } from "react";
 import FormInput from "../form-input/FormInput";
 import CustomButton from "../custom-button/CustomButton";
 import { signInWithGoogle } from "../../firebase/firebase.utils";
@@ -11,12 +11,12 @@ const SignIn: React.FC = () => {
     password: "",
   });
 
-  const handleSubmit = (event: React.FormEvent<HTMLElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLElement>) => {
     event.preventDefault();
     setFormValues({ email: "", password: "" });
   };
 
-  const handleChange = (event: React.FormEvent<HTMLInputElement>) => {
+  const handleChange = (event: FormEvent<HTMLInputElement>) => {
     const { value, name } = event.currentTarget;
     setFormValues(previousState => ({ ...previousState, [name]: value }));
   };
