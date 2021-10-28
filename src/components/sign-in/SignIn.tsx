@@ -1,7 +1,7 @@
 import React, { FormEvent, useState } from "react";
 import FormInput from "../form-input/FormInput";
 import CustomButton from "../custom-button/CustomButton";
-import { signInWithGoogle } from "../../firebase/firebase.utils";
+import { auth, signInWithGoogle } from "../../firebase/firebase.utils";
 
 import "./sign-in.scss";
 
@@ -11,9 +11,18 @@ const SignIn: React.FC = () => {
     password: "",
   });
 
-  const handleSubmit = (event: FormEvent<HTMLElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLElement>) => {
     event.preventDefault();
-    setFormValues({ email: "", password: "" });
+
+    const { email, password } = formValues;
+
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+      setFormValues({ email: "", password: "" });
+    } catch (error) {
+      alert("Either email or password are wrong");
+      console.log(error);
+    }
   };
 
   const handleChange = (event: FormEvent<HTMLInputElement>) => {
