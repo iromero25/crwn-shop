@@ -5,7 +5,7 @@ import { ISetCurrentUserAction } from "./user.actions";
 const userReducer = (currentState: CurrentUser = null, action: ISetCurrentUserAction) => {
   switch (action.type) {
     case SET_CURRENT_USER:
-      return { ...action.payload };
+      return action.payload;
     default:
       return currentState;
   }

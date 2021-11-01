@@ -34,8 +34,8 @@ const Header: React.FC<ReduxProps> = ({ currentUser }) => (
   </div>
 );
 
-const mapStateToProps = (state: Store) => ({
-  currentUser: state.currentUser,
+const mapStateToProps = ({ currentUser }: Store) => ({
+  currentUser,
 });
 
 const Connector = connect(mapStateToProps);
