@@ -4,12 +4,14 @@ import { ReactComponent as Logo } from "../../assets/crown.svg";
 import { auth } from "../../firebase/firebase.utils";
 import { connect, ConnectedProps } from "react-redux";
 import { Store } from "../../redux/root-reducer";
+import CartIcon from "../cart-icon/CartIcon";
+import CartDropdown from "../cart-dropdown/CartDropdown";
 
 import "./header.scss";
 
 interface ReduxProps extends ConnectedProps<typeof Connector> {}
 
-const Header: React.FC<ReduxProps> = ({ currentUser }) => (
+const Header: React.FC<ReduxProps> = ({ currentUser, isCartHidden }) => (
   <div className="header">
     <Link to="/">
       <Logo className="logo" />
@@ -30,12 +32,15 @@ const Header: React.FC<ReduxProps> = ({ currentUser }) => (
           SIGN IN
         </Link>
       )}
+      <CartIcon />
     </div>
+    {isCartHidden ? null : <CartDropdown />}
   </div>
 );
 
-const mapStateToProps = ({ currentUser }: Store) => ({
+const mapStateToProps = ({ currentUser, isCartHidden }: Store) => ({
   currentUser,
+  isCartHidden,
 });
 
 const Connector = connect(mapStateToProps);
