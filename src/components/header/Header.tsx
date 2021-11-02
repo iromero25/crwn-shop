@@ -38,7 +38,7 @@ const Header: React.FC<ReduxProps> = ({ currentUser, isCartHidden }) => (
   </div>
 );
 
-const mapStateToProps = ({ currentUser, isCartHidden }: Store) => ({
+const mapStateToProps = ({ currentUser, cart: { isCartHidden } }: Store) => ({
   currentUser,
   isCartHidden,
 });

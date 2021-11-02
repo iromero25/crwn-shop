@@ -1,17 +1,4 @@
-/* Used as starting data for ShopPage */
-export interface IItem {
-  id: number;
-  name: string;
-  imageUrl: string;
-  price: number;
-}
-
-export interface IShopData {
-  id: number;
-  title: string;
-  routeName: string;
-  items: IItem[];
-}
+import { IShopData } from "../../components/types";
 
 const SHOP_DATA: IShopData[] = [
   {
