@@ -4,6 +4,8 @@ import HomePage from "./pages/homepage/HomePage";
 import Shop from "./pages/shop/Shop";
 import Header from "./components/header/Header";
 import SignInAndSignOut from "./pages/sign/SignInAndSingOut";
+import CheckoutPage from "./pages/checkout/Checkout";
+
 import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
 import { CurrentUser } from "./components/types";
 import { connect, ConnectedProps } from "react-redux";
@@ -44,6 +46,7 @@ const App: React.FC<ReduxProps> = ({ currentUser, setCurrentUser }) => {
       <Switch>
         <Route exact path="/" component={HomePage} />
         <Route path="/shop" component={Shop} />
+        <Route exact path="/checkout" component={CheckoutPage} />
         <Route
           path="/signin"
           render={() => (currentUser ? <Redirect to="/" /> : <SignInAndSignOut />)}

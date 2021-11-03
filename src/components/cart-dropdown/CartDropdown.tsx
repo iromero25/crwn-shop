@@ -3,27 +3,46 @@ import CustomButton from "../custom-button/CustomButton";
 import CartItem from "../cart-item/CartItem";
 import { Store } from "../../redux/root-reducer";
 import { connect, ConnectedProps } from "react-redux";
+import { withRouter, RouteComponentProps } from "react-router";
 
 import "./cart-dropdown.scss";
+import { toggleCartHidden } from "../../redux/cart/cart.actions";
 
 interface ReduxProps extends ConnectedProps<typeof Connector> {}
 
-const CartDropdown: React.FC<ReduxProps> = ({ cartItems }) => (
-  <div className="cart-dropdown">
-    <div className="cart-items">
-      {cartItems.map(item => (
-        <CartItem key={item.id} item={item} />
-      ))}
-    </div>
-    <CustomButton>GO TO CHECKOUT</CustomButton>
-  </div>
-);
+type Props = ReduxProps & RouteComponentProps;
 
-// toDo: all actions should return an Action type
+const CartDropdown: React.FC<Props> = ({ cartItems, hideDropdown, history }) => {
+  console.log("CartDropdown is being re-rendered because cart items changed");
+  return (
+    <div className="cart-dropdown">
+      <div className="cart-items">
+        {cartItems.length ? (
+          cartItems.map(item => <CartItem key={item.id} item={item} />)
+        ) : (
+          <span className="empty-message">Your cart is empty</span>
+        )}
+      </div>
+      <CustomButton
+        onClick={() => {
+          history.push("/checkout");
+          hideDropdown();
+        }}
+      >
+        GO TO CHECKOUT
+      </CustomButton>
+    </div>
+  );
+};
+
 const mapStateToProps = ({ cart }: Store) => ({
   cartItems: cart.cartItems,
 });
 
-const Connector = connect(mapStateToProps);
+const mapDispatchToProps = {
+  hideDropdown: toggleCartHidden,
+};
 
-export default Connector(CartDropdown);
+const Connector = connect(mapStateToProps, mapDispatchToProps);
+
+export default withRouter(Connector(CartDropdown));

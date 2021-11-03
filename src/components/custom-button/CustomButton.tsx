@@ -7,10 +7,10 @@ import { Action } from "redux";
 
 interface Props {
   children: React.ReactNode;
-  onClick?: () => Action | Promise<firebase.auth.UserCredential>;
   type?: "submit";
   isGoogleSignIn?: boolean;
   inverted?: boolean;
+  onClick?: () => Action | Promise<firebase.auth.UserCredential> | void;
 }
 
 const CustomButton: React.FunctionComponent<Props> = ({
