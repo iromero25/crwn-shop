@@ -1,4 +1,5 @@
 import firebase from "firebase/compat";
+import CollectionItem from "./collection/CollectionItem";
 
 export type CurrentUser = firebase.firestore.DocumentData | null;
 
@@ -20,3 +21,7 @@ export interface IShopData {
   routeName: string;
   items: IItem[];
 }
+
+type CollectionKeys = "hats" | "jackets" | "sneakers" | "mens" | "womens";
+
+export type Collection = Record<CollectionKeys, IShopData>;

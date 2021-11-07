@@ -1,7 +1,7 @@
-import { IShopData } from "../../components/types";
+import { Collection } from "../../components/types";
 
-const SHOP_DATA: IShopData[] = [
-  {
+const COLLECTION_DATA: Collection = {
+  hats: {
     id: 1,
     title: "Hats",
     routeName: "hats",
@@ -71,7 +71,7 @@ const SHOP_DATA: IShopData[] = [
       },
     ],
   },
-  {
+  sneakers: {
     id: 2,
     title: "Sneakers",
     routeName: "sneakers",
@@ -134,7 +134,7 @@ const SHOP_DATA: IShopData[] = [
       },
     ],
   },
-  {
+  jackets: {
     id: 3,
     title: "Jackets",
     routeName: "jackets",
@@ -176,7 +176,7 @@ const SHOP_DATA: IShopData[] = [
       },
     ],
   },
-  {
+  womens: {
     id: 4,
     title: "Womens",
     routeName: "womens",
@@ -232,7 +232,7 @@ const SHOP_DATA: IShopData[] = [
       },
     ],
   },
-  {
+  mens: {
     id: 5,
     title: "Mens",
     routeName: "mens",
@@ -281,6 +281,6 @@ const SHOP_DATA: IShopData[] = [
       },
     ],
   },
-];
+};
 
-export default SHOP_DATA;
+export default COLLECTION_DATA;
