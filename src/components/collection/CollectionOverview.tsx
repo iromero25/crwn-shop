@@ -1,6 +1,5 @@
 import React from "react";
 import { Collection } from "../types";
-import { keys } from "../../utils/utils";
 import CollectionPreview from "./CollectionPreview";
 
 import "./collection-overview.scss";
@@ -15,10 +14,9 @@ interface Props {
  */
 const CollectionOverview: React.FC<Props> = ({ collections }) => (
   <div className="collections-overview">
-    {keys(collections).map(key => {
-      const collectionItem = collections[key];
-      return <CollectionPreview key={collectionItem.id} {...collectionItem} />;
-    })}
+    {Object.values(collections).map(collectionItem => (
+      <CollectionPreview key={collectionItem.id} {...collectionItem} />
+    ))}
   </div>
 );
 

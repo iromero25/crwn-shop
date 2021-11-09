@@ -1,28 +1,54 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { connect, ConnectedProps } from "react-redux";
 import { Route } from "react-router-dom";
 import { RouteComponentProps } from "react-router";
 
-import { Collection } from "../../components/types";
 import CollectionPage from "../collection/CollectionPage";
-import COLLECTION_DATA from "./collection.data";
 import CollectionOverview from "../../components/collection/CollectionOverview";
 
-const Shop: React.FC<RouteComponentProps> = ({ match }) => {
-  const [collections] = useState<Collection>(COLLECTION_DATA);
+import { Collection } from "../../components/types";
+import { addCollection } from "../../redux/shop/shop.actions";
+import { convertCollectionSnapshotToMap, firestore } from "../../firebase/firebase.utils";
+
+type Props = ConnectedProps<typeof Connector> & RouteComponentProps;
+
+const Shop: React.FC<Props> = ({ match, addCollections }) => {
+  const [collections, setCollections] = useState<Collection>();
+
+  useEffect(() => {
+    const collectionRef = firestore.collection("collections");
+
+    const unsubscribeFromSnapshot = collectionRef.onSnapshot(snapshot => {
+      const collection = convertCollectionSnapshotToMap(snapshot);
+      console.log(collection);
+      addCollections(collection);
+      setCollections(collection);
+    });
+
+    return () => unsubscribeFromSnapshot();
+  }, []);
 
   return (
     <div className="shop-page">
       <Route
         exact
         path={`${match.path}`}
-        render={() => <CollectionOverview collections={collections} />}
+        render={() =>
+          collections ? <CollectionOverview collections={collections} /> : null
+        }
       />
       <Route
         path={`${match.path}/:categoryId`}
-        render={() => <CollectionPage collections={collections} />}
+        render={() => (collections ? <CollectionPage collections={collections} /> : null)}
       />
     </div>
   );
 };
 
-export default Shop;
+const mapDispatchToProps = {
+  addCollections: (collection: Collection) => addCollection(collection),
+};
+
+const Connector = connect(null, mapDispatchToProps);
+
+export default Connector(Shop);

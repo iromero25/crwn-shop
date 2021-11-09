@@ -1,6 +1,7 @@
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import "firebase/compat/auth";
+import { Collection } from "../components/types";
 
 const config = {
   apiKey: "AIzaSyCjflNtWx1LkoDxAfKLvzN5qBIpQUjGANo",
@@ -47,8 +48,41 @@ export const createUserProfileDocument = async (
   }
 
   return userRef;
-
-  // console.log(snapshot);
 };
+
+export const addCollectionAndDocuments = async (
+  collectionKey: string,
+  objectsToAdd: Collection
+) => {
+  const collectionRef = firestore.collection(collectionKey);
+  const batch = firestore.batch();
+
+  Object.values(objectsToAdd).forEach(({ title, items }) => {
+    const newDocRef = collectionRef.doc(); // creates a doc id randomly
+    const itemToStore = {
+      title,
+      items,
+    };
+    batch.set(newDocRef, itemToStore);
+  });
+  return await batch.commit(); // batch.commit is an asynchronous operation
+};
+
+export const convertCollectionSnapshotToMap = (
+  collections: firebase.firestore.QuerySnapshot
+) =>
+  collections.docs.reduce((accumulator, doc) => {
+    const { title, items } = doc.data();
+    const lowerCaseTitle = title.toLowerCase();
+    return {
+      ...accumulator,
+      [lowerCaseTitle]: {
+        routeName: encodeURI(lowerCaseTitle),
+        id: doc.id,
+        title,
+        items,
+      },
+    };
+  }, {} as Collection);
 
 export default firebase;

@@ -1,5 +1,7 @@
 import React, { useEffect } from "react";
+import { connect, ConnectedProps } from "react-redux";
 import { Switch, Route, Redirect } from "react-router-dom";
+
 import HomePage from "./pages/homepage/HomePage";
 import Shop from "./pages/shop/Shop";
 import Header from "./components/header/Header";
@@ -8,11 +10,10 @@ import CheckoutPage from "./pages/checkout/Checkout";
 
 import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
 import { CurrentUser } from "./components/types";
-import { connect, ConnectedProps } from "react-redux";
 import { setCurrentUser } from "./redux/user/user.actions";
+import { Store } from "./redux/root-reducer";
 
 import "./App.css";
-import { Store } from "./redux/root-reducer";
 
 interface ReduxProps extends ConnectedProps<typeof Connector> {}
 
@@ -33,6 +34,7 @@ const App: React.FC<ReduxProps> = ({ currentUser, setCurrentUser }) => {
       } else {
         setCurrentUser(null);
       }
+      // addCollectionAndDocuments("collections", COLLECTION_DATA);
     });
 
     return () => {
