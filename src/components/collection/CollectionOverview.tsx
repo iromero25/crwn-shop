@@ -1,12 +1,11 @@
 import React from "react";
-import { Collection } from "../types";
+import { Store } from "../../redux/root-reducer";
 import CollectionPreview from "./CollectionPreview";
+import { connect, ConnectedProps } from "react-redux";
 
 import "./collection-overview.scss";
 
-interface Props {
-  collections: Collection;
-}
+interface Props extends ConnectedProps<typeof Connector> {}
 
 /**
  * This is the component showing all the shop items for a specific
@@ -20,4 +19,10 @@ const CollectionOverview: React.FC<Props> = ({ collections }) => (
   </div>
 );
 
-export default CollectionOverview;
+const mapStateToProps = ({ collections }: Store) => ({
+  collections,
+});
+
+const Connector = connect(mapStateToProps);
+
+export default Connector(CollectionOverview);

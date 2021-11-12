@@ -1,5 +1,4 @@
 import firebase from "firebase/compat";
-import CollectionItem from "./collection/CollectionItem";
 
 export type CurrentUser = firebase.firestore.DocumentData | null;
 

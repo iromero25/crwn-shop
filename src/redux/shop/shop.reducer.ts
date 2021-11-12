@@ -3,7 +3,7 @@ import { IAddCollectionAction } from "./shop.actions";
 import { ADD_COLLECTION } from "./types";
 
 const shopReducer = (
-  currentState: Partial<Collection> = {},
+  currentState: Collection = {} as Collection,
   action: IAddCollectionAction
 ) => {
   switch (action.type) {
