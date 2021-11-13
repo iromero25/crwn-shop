@@ -5,6 +5,7 @@ import { RouteComponentProps } from "react-router-dom";
 import CollectionItem from "../../components/collection/CollectionItem";
 import { Collection, IShopData } from "../../components/types";
 import { Store } from "../../redux/root-reducer";
+import { selectCollections } from "../../redux/shop/shop.selector";
 
 import "./collection.scss";
 
@@ -14,13 +15,13 @@ export interface IRouteParams {
   categoryId: string;
 }
 
-interface Props
-  extends RouteComponentProps<IRouteParams>,
-    ConnectedProps<typeof Connector> {
+type RouteProps = RouteComponentProps<IRouteParams>;
+type ReduxProps = ConnectedProps<typeof Connector>;
+type Props = RouteProps & ReduxProps;
 
 const CollectionPage: React.FC<Props> = ({ match, collections }) => {
   const { categoryId } = match.params;
-  const { title, items } = collections[categoryId as keyof Collection]; // he cast the category heres
+  const { title, items } = collections[categoryId as keyof Collection]; // cast the category here
 
   return (
     <div className="collection-page">
@@ -34,8 +35,8 @@ const CollectionPage: React.FC<Props> = ({ match, collections }) => {
   );
 };
 
-const mapStateToProps = ({ collections }: Store) => ({
-  collections,
+const mapStateToProps = (state: Store) => ({
+  collections: selectCollections(state),
 });
 
 const Connector = connect(mapStateToProps);

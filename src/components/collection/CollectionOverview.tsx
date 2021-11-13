@@ -4,6 +4,7 @@ import CollectionPreview from "./CollectionPreview";
 import { connect, ConnectedProps } from "react-redux";
 
 import "./collection-overview.scss";
+import { selectCollections } from "../../redux/shop/shop.selector";
 
 interface Props extends ConnectedProps<typeof Connector> {}
 
@@ -19,8 +20,8 @@ const CollectionOverview: React.FC<Props> = ({ collections }) => (
   </div>
 );
 
-const mapStateToProps = ({ collections }: Store) => ({
-  collections,
+const mapStateToProps = (state: Store) => ({
+  collections: selectCollections(state),
 });
 
 const Connector = connect(mapStateToProps);

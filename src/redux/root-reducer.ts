@@ -6,7 +6,7 @@ import userReducer from "./user/user.reducer";
 const rootReducer = combineReducers({
   currentUser: userReducer,
   cart: toggleCartReducer,
-  collections: shopReducer,
+  shop: shopReducer,
 });
 
 export type Store = ReturnType<typeof rootReducer>;
