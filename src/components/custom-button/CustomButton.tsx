@@ -7,7 +7,7 @@ import { Action } from "redux";
 
 interface Props {
   children: React.ReactNode;
-  type?: "submit";
+  type?: "submit" | "button";
   isGoogleSignIn?: boolean;
   inverted?: boolean;
   onClick?: () => Action | Promise<firebase.auth.UserCredential> | void;

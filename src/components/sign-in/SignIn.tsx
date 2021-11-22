@@ -1,12 +1,17 @@
 import React, { FormEvent, useState } from "react";
+import { connect, ConnectedProps } from "react-redux";
+
+import { IEmailAndPassword } from "../types";
 import FormInput from "../form-input/FormInput";
 import CustomButton from "../custom-button/CustomButton";
-import { auth, signInWithGoogle } from "../../firebase/firebase.utils";
+import { startEmailSignIn, startGoogleSignIn } from "../../redux/user/user.actions";
 
 import "./sign-in.scss";
 
-const SignIn: React.FC = () => {
-  const [formValues, setFormValues] = useState<{ email: string; password: string }>({
+interface Props extends ConnectedProps<typeof Connector> {}
+
+const SignIn: React.FC<Props> = ({ signInWithGoogle, signInWithEmail }) => {
+  const [emailAndPassword, setemailAndPassword] = useState<IEmailAndPassword>({
     email: "",
     password: "",
   });
@@ -14,11 +19,9 @@ const SignIn: React.FC = () => {
   const handleSubmit = async (event: FormEvent<HTMLElement>) => {
     event.preventDefault();
 
-    const { email, password } = formValues;
-
     try {
-      await auth.signInWithEmailAndPassword(email, password);
-      setFormValues({ email: "", password: "" });
+      signInWithEmail(emailAndPassword);
+      setemailAndPassword({ email: "", password: "" });
     } catch (error) {
       alert("Either email or password are wrong");
       console.log(error);
@@ -27,10 +30,10 @@ const SignIn: React.FC = () => {
 
   const handleChange = (event: FormEvent<HTMLInputElement>) => {
     const { value, name } = event.currentTarget;
-    setFormValues(previousState => ({ ...previousState, [name]: value }));
+    setemailAndPassword(previousState => ({ ...previousState, [name]: value }));
   };
 
-  const { email, password } = formValues;
+  const { email, password } = emailAndPassword;
 
   return (
     <div className="sign-in">
@@ -56,7 +59,7 @@ const SignIn: React.FC = () => {
         />
         <div className="buttons">
           <CustomButton type="submit">Sign In</CustomButton>
-          <CustomButton onClick={signInWithGoogle} isGoogleSignIn>
+          <CustomButton type="button" onClick={signInWithGoogle} isGoogleSignIn>
             Sign In with Google
           </CustomButton>
         </div>
@@ -65,4 +68,12 @@ const SignIn: React.FC = () => {
   );
 };
 
-export default SignIn;
+const mapDispatchToProps = {
+  signInWithGoogle: startGoogleSignIn,
+  signInWithEmail: (emailAndPassword: IEmailAndPassword) =>
+    startEmailSignIn(emailAndPassword),
+};
+
+const Connector = connect(null, mapDispatchToProps);
+
+export default Connector(SignIn);

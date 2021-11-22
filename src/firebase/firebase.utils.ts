@@ -17,13 +17,15 @@ firebase.initializeApp(config);
 
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
-export type SnapshopType =
-  firebase.firestore.QuerySnapshot<firebase.firestore.DocumentData>;
 
-const provider = new firebase.auth.GoogleAuthProvider();
-provider.setCustomParameters({ prompt: "select_account" });
+type DocumentData = firebase.firestore.DocumentData;
+export type SnapshopType = firebase.firestore.QuerySnapshot<DocumentData>;
+export type DocumentRefType = firebase.firestore.DocumentReference<DocumentData>;
+export type DocumentSnapshotType = firebase.firestore.DocumentSnapshot<DocumentData>;
 
-export const signInWithGoogle = () => auth.signInWithPopup(provider);
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: "select_account" });
+export const signInWithGoogle = () => auth.signInWithPopup(googleProvider);
 
 export const createUserProfileDocument = async (
   userAuth: firebase.User | null,

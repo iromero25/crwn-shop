@@ -4,7 +4,7 @@ import shopReducer from "./shop/shop.reducer";
 import userReducer from "./user/user.reducer";
 
 const rootReducer = combineReducers({
-  currentUser: userReducer,
+  user: userReducer,
   cart: toggleCartReducer,
   shop: shopReducer,
 });
