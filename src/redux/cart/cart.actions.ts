@@ -1,11 +1,18 @@
 import {
   ADD_CART_ITEM,
+  CLEAR_CART,
   DECREASE_CART_ITEM_QTY,
   REMOVE_CART_ITEM,
   TOGGLE_CART_HIDDEN,
 } from "./types";
 import { Action } from "redux";
 import { IItem } from "../../components/types";
+
+export interface IClearCart extends Action<typeof CLEAR_CART> {}
+
+export const clearCart = (): IClearCart => ({
+  type: CLEAR_CART,
+});
 
 export interface IToggleCartHiddenAction extends Action<typeof TOGGLE_CART_HIDDEN> {}
 
