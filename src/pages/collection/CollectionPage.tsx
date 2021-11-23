@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import { RouteComponentProps } from "react-router-dom";
 
 import CollectionItem from "../../components/collection/CollectionItem";
-import { Collection, IShopData } from "../../components/types";
+import { Collection } from "../../components/types";
 import { Store } from "../../redux/root-reducer";
 import { selectCollections } from "../../redux/shop/shop.selector";
 
@@ -21,7 +21,7 @@ type Props = RouteProps & ReduxProps;
 
 const CollectionPage: React.FC<Props> = ({ match, collections }) => {
   const { categoryId } = match.params;
-  const { title, items } = collections[categoryId as keyof Collection]; // cast the category here
+  const { title, items } = collections[categoryId as keyof Collection];
 
   return (
     <div className="collection-page">

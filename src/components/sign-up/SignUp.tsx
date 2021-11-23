@@ -1,9 +1,11 @@
 import React, { FormEvent, useState } from "react";
+import { connect, ConnectedProps } from "react-redux";
+
 import FormInput from "../form-input/FormInput";
-import { auth, createUserProfileDocument } from "../../firebase/firebase.utils";
+import CustomButton from "../custom-button/CustomButton";
+import { signUpStart } from "../../redux/user/user.actions";
 
 import "./sign-up.scss";
-import CustomButton from "../custom-button/CustomButton";
 
 interface ISignUpFormData {
   displayName: string;
@@ -19,7 +21,9 @@ const emptySignUpData: ISignUpFormData = {
   confirmPassword: "",
 };
 
-const SignUp: React.FC = () => {
+interface Props extends ConnectedProps<typeof Connect> {}
+
+const SignUp: React.FC<Props> = ({ signUpStart }) => {
   const [signUpFormData, setSignUpFormData] = useState<ISignUpFormData>(emptySignUpData);
   const { displayName, email, password, confirmPassword } = signUpFormData;
 
@@ -32,13 +36,7 @@ const SignUp: React.FC = () => {
       return;
     }
 
-    try {
-      const { user } = await auth.createUserWithEmailAndPassword(email, password);
-      await createUserProfileDocument(user, { displayName });
-      setSignUpFormData(emptySignUpData);
-    } catch (error) {
-      console.error(error);
-    }
+    signUpStart({ email, password, displayName });
   };
 
   const handleChange = (event: FormEvent<HTMLInputElement>) => {
@@ -89,4 +87,10 @@ const SignUp: React.FC = () => {
   );
 };
 
-export default SignUp;
+const mapDispatchToProps = {
+  signUpStart,
+};
+
+const Connect = connect(null, mapDispatchToProps);
+
+export default Connect(SignUp);

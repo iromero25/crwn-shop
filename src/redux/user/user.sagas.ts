@@ -12,6 +12,7 @@ import {
 import {
   CHECK_USER_SESSION,
   SIGN_OUT_START,
+  SIGN_UP_START,
   START_EMAIL_SIGN_IN,
   START_GOOGLE_SIGN_IN,
 } from "./types";
@@ -21,6 +22,9 @@ import {
   signInFailed,
   signOutSuccess,
   signOutFailure,
+  ISignUpStartAction,
+  signUpFailure,
+  startEmailSignIn,
 } from "./user.actions";
 
 type GenericError = any & { message: string };
@@ -53,9 +57,15 @@ function* onSignOutStart() {
   yield takeEvery(SIGN_OUT_START, signOut);
 }
 
-function* getSnapshotFromUserAuth(user: AuthUserCredential["user"]) {
+function* getSnapshotFromUserAuth(
+  user: AuthUserCredential["user"],
+  additionalData?: Record<string, any>
+) {
   try {
-    const userRef: DocumentRefType = yield createUserProfileDocument(user);
+    const userRef: DocumentRefType = yield createUserProfileDocument(
+      user,
+      additionalData
+    );
     const userSnapshot: DocumentSnapshotType = yield userRef.get();
     yield put(signInSuccess({ id: userSnapshot.id, ...userSnapshot.data() }));
   } catch (error: GenericError) {
@@ -92,11 +102,32 @@ function* googleSignInStart() {
   yield takeEvery(START_GOOGLE_SIGN_IN, signInWithGoogleSaga);
 }
 
+function* signUp(action: ISignUpStartAction) {
+  const {
+    payload: { email, password, displayName },
+  } = action;
+
+  try {
+    const { user }: AuthUserCredential = yield auth.createUserWithEmailAndPassword(
+      email,
+      password
+    );
+    yield getSnapshotFromUserAuth(user, { displayName });
+  } catch (error: GenericError) {
+    yield put(signUpFailure(error.message));
+  }
+}
+
+function* onSignUpStart() {
+  yield takeEvery(SIGN_UP_START, signUp);
+}
+
 export default function* userSagas() {
   yield all([
     googleSignInStart(),
     emailPasswordSignInStart(),
     onCheckUserSession(),
     onSignOutStart(),
+    onSignUpStart(),
   ]);
 }

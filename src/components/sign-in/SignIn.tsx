@@ -11,7 +11,7 @@ import "./sign-in.scss";
 interface Props extends ConnectedProps<typeof Connector> {}
 
 const SignIn: React.FC<Props> = ({ signInWithGoogle, signInWithEmail }) => {
-  const [emailAndPassword, setemailAndPassword] = useState<IEmailAndPassword>({
+  const [emailAndPassword, setEmailAndPassword] = useState<IEmailAndPassword>({
     email: "",
     password: "",
   });
@@ -21,7 +21,7 @@ const SignIn: React.FC<Props> = ({ signInWithGoogle, signInWithEmail }) => {
 
     try {
       signInWithEmail(emailAndPassword);
-      setemailAndPassword({ email: "", password: "" });
+      setEmailAndPassword({ email: "", password: "" });
     } catch (error) {
       alert("Either email or password are wrong");
       console.log(error);
@@ -30,7 +30,7 @@ const SignIn: React.FC<Props> = ({ signInWithGoogle, signInWithEmail }) => {
 
   const handleChange = (event: FormEvent<HTMLInputElement>) => {
     const { value, name } = event.currentTarget;
-    setemailAndPassword(previousState => ({ ...previousState, [name]: value }));
+    setEmailAndPassword(previousState => ({ ...previousState, [name]: value }));
   };
 
   const { email, password } = emailAndPassword;

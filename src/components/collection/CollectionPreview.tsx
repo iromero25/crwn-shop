@@ -32,4 +32,4 @@ const CollectionPreview: React.FC<Props> = ({
   </div>
 );
 
-export default withRouter(CollectionPreview); // do we need withRouter?
+export default withRouter(CollectionPreview);

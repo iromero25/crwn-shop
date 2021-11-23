@@ -1,5 +1,10 @@
 import { Action } from "redux";
-import { CurrentUser, Error, IEmailAndPassword } from "../../components/types";
+import {
+  CurrentUser,
+  Error,
+  IEmailAndPassword,
+  ICredentials,
+} from "../../components/types";
 import * as Types from "./types";
 
 export const checkUserSession = () => ({
@@ -56,5 +61,23 @@ export interface ISignInFailed extends Action<typeof Types.SIGN_IN_FAILURE> {
 
 export const signInFailed = (error: Error): ISignInFailed => ({
   type: Types.SIGN_IN_FAILURE,
+  payload: error,
+});
+
+export interface ISignUpStartAction extends Action<typeof Types.SIGN_UP_START> {
+  payload: ICredentials;
+}
+
+export const signUpStart = (credentials: ICredentials): ISignUpStartAction => ({
+  type: Types.SIGN_UP_START,
+  payload: credentials,
+});
+
+export interface ISignUpFailureAction extends Action<typeof Types.SIGN_UP_FAILURE> {
+  payload: string;
+}
+
+export const signUpFailure = (error: string) => ({
+  type: Types.SIGN_UP_FAILURE,
   payload: error,
 });

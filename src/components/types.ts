@@ -30,3 +30,7 @@ export interface IEmailAndPassword {
   email: string;
   password: string;
 }
+
+export interface ICredentials extends IEmailAndPassword {
+  displayName: string;
+}
