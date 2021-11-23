@@ -1,7 +1,7 @@
 import { all } from "redux-saga/effects";
 import { fetchCollectionsStart } from "./shop/shop.sagas";
-import { googleSignInStart, emailPasswordSignInStart } from "./user/user.sagas";
+import userSagas from "./user/user.sagas";
 
 export default function* rootSaga() {
-  yield all([fetchCollectionsStart(), googleSignInStart(), emailPasswordSignInStart()]);
+  yield all([fetchCollectionsStart(), userSagas()]);
 }

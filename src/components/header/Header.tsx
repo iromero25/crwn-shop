@@ -1,17 +1,19 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ReactComponent as Logo } from "../../assets/crown.svg";
-import { auth } from "../../firebase/firebase.utils";
 import { connect, ConnectedProps } from "react-redux";
 import { Store } from "../../redux/root-reducer";
 import CartIcon from "../cart-icon/CartIcon";
 import CartDropdown from "../cart-dropdown/CartDropdown";
+import { selectCurrentUser } from "../../redux/user/user.selector";
+import { selectIsCartHidden } from "../../redux/cart/cart.selectors";
+import { signOutStart } from "../../redux/user/user.actions";
 
 import "./header.scss";
 
 interface ReduxProps extends ConnectedProps<typeof Connector> {}
 
-const Header: React.FC<ReduxProps> = ({ currentUser, isCartHidden }) => (
+const Header: React.FC<ReduxProps> = ({ currentUser, isCartHidden, signOutStart }) => (
   <div className="header">
     <Link to="/">
       <Logo className="logo" />
@@ -24,7 +26,7 @@ const Header: React.FC<ReduxProps> = ({ currentUser, isCartHidden }) => (
         CONTACT
       </Link>
       {currentUser ? (
-        <div className="option" onClick={() => auth.signOut()}>
+        <div className="option" onClick={signOutStart}>
           SIGN OUT
         </div>
       ) : (
@@ -38,11 +40,15 @@ const Header: React.FC<ReduxProps> = ({ currentUser, isCartHidden }) => (
   </div>
 );
 
-const mapStateToProps = ({ currentUser, cart: { isCartHidden } }: Store) => ({
-  currentUser,
-  isCartHidden,
+const mapStateToProps = (state: Store) => ({
+  currentUser: selectCurrentUser(state),
+  isCartHidden: selectIsCartHidden(state),
 });
 
-const Connector = connect(mapStateToProps);
+const mapDispatchToProps = {
+  signOutStart,
+};
+
+const Connector = connect(mapStateToProps, mapDispatchToProps);
 
 export default Connector(Header);

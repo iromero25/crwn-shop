@@ -2,44 +2,23 @@ import React, { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { Switch, Route, Redirect } from "react-router-dom";
 
-import HomePage from "./pages/homepage/HomePage";
 import Shop from "./pages/shop/Shop";
 import Header from "./components/header/Header";
-import SignInAndSignOut from "./pages/sign/SignInAndSingOut";
+import HomePage from "./pages/homepage/HomePage";
 import CheckoutPage from "./pages/checkout/Checkout";
+import SignInAndSignOut from "./pages/sign/SignInAndSingOut";
 
-import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
-import { CurrentUser } from "./components/types";
-import { setCurrentUser } from "./redux/user/user.actions";
 import { Store } from "./redux/root-reducer";
+import { selectCurrentUser } from "./redux/user/user.selector";
 
 import "./App.css";
+import { checkUserSession } from "./redux/user/user.actions";
 
 interface ReduxProps extends ConnectedProps<typeof Connector> {}
 
-const App: React.FC<ReduxProps> = ({ currentUser, setCurrentUser }) => {
+const App: React.FC<ReduxProps> = ({ currentUser, checkUserSession }) => {
   useEffect(() => {
-    const unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
-      if (userAuth) {
-        const userRef = await createUserProfileDocument(userAuth);
-
-        if (userRef) {
-          userRef.onSnapshot(snapShot => {
-            setCurrentUser({
-              id: snapShot.id,
-              ...snapShot.data(),
-            });
-          });
-        }
-      } else {
-        setCurrentUser(null);
-      }
-      // addCollectionAndDocuments("collections", COLLECTION_DATA);
-    });
-
-    return () => {
-      unsubscribeFromAuth();
-    };
+    checkUserSession();
   }, []);
 
   return (
@@ -58,12 +37,12 @@ const App: React.FC<ReduxProps> = ({ currentUser, setCurrentUser }) => {
   );
 };
 
-const mapStateToProps = ({ currentUser }: Store) => ({
-  currentUser,
+const mapStateToProps = (state: Store) => ({
+  currentUser: selectCurrentUser(state),
 });
 
 const mapDispatchToProps = {
-  setCurrentUser: (user: CurrentUser) => setCurrentUser(user),
+  checkUserSession,
 };
 
 const Connector = connect(mapStateToProps, mapDispatchToProps);

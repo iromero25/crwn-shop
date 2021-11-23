@@ -19,6 +19,7 @@ export const auth = firebase.auth();
 export const firestore = firebase.firestore();
 
 type DocumentData = firebase.firestore.DocumentData;
+export type FirebaseUser = firebase.User | null;
 export type SnapshopType = firebase.firestore.QuerySnapshot<DocumentData>;
 export type DocumentRefType = firebase.firestore.DocumentReference<DocumentData>;
 export type DocumentSnapshotType = firebase.firestore.DocumentSnapshot<DocumentData>;
@@ -28,7 +29,7 @@ googleProvider.setCustomParameters({ prompt: "select_account" });
 export const signInWithGoogle = () => auth.signInWithPopup(googleProvider);
 
 export const createUserProfileDocument = async (
-  userAuth: firebase.User | null,
+  userAuth: FirebaseUser,
   additionalData?: Record<string, any>
 ) => {
   if (!userAuth) return;
@@ -88,5 +89,13 @@ export const convertCollectionSnapshotToMap = (
       },
     };
   }, {} as Collection);
+
+export const getCurrentUser = (): Promise<FirebaseUser> =>
+  new Promise((resolve, reject) => {
+    const unsubscribe = auth.onAuthStateChanged(userAuth => {
+      unsubscribe();
+      resolve(userAuth);
+    }, reject);
+  });
 
 export default firebase;
