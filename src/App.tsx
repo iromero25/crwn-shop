@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Switch, Route, Redirect } from "react-router-dom";
 
 import Shop from "./pages/shop/Shop";
@@ -7,18 +7,17 @@ import Header from "./components/header/Header";
 import HomePage from "./pages/homepage/HomePage";
 import CheckoutPage from "./pages/checkout/Checkout";
 import SignInAndSignOut from "./pages/sign/SignInAndSingOut";
-
-import { Store } from "./redux/root-reducer";
+import { checkUserSession } from "./redux/user/user.actions";
 import { selectCurrentUser } from "./redux/user/user.selector";
 
 import "./App.css";
-import { checkUserSession } from "./redux/user/user.actions";
 
-interface ReduxProps extends ConnectedProps<typeof Connector> {}
+const App: React.FC = () => {
+  const currentUser = useSelector(selectCurrentUser);
+  const dispatch = useDispatch();
 
-const App: React.FC<ReduxProps> = ({ currentUser, checkUserSession }) => {
   useEffect(() => {
-    checkUserSession();
+    dispatch(checkUserSession());
   }, []);
 
   return (
@@ -37,14 +36,4 @@ const App: React.FC<ReduxProps> = ({ currentUser, checkUserSession }) => {
   );
 };
 
-const mapStateToProps = (state: Store) => ({
-  currentUser: selectCurrentUser(state),
-});
-
-const mapDispatchToProps = {
-  checkUserSession,
-};
-
-const Connector = connect(mapStateToProps, mapDispatchToProps);
-
-export default Connector(App);
+export default App;
