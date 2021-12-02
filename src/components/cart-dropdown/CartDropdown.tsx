@@ -1,19 +1,20 @@
 import React from "react";
-import CustomButton from "../custom-button/CustomButton";
+import { useHistory } from "react-router";
+import { useSelector, useDispatch } from "react-redux";
+
 import CartItem from "../cart-item/CartItem";
 import { Store } from "../../redux/root-reducer";
-import { connect, ConnectedProps } from "react-redux";
-import { withRouter, RouteComponentProps } from "react-router";
-
-import "./cart-dropdown.scss";
+import CustomButton from "../custom-button/CustomButton";
 import { toggleCartHidden } from "../../redux/cart/cart.actions";
 
-interface ReduxProps extends ConnectedProps<typeof Connector> {}
+import "./cart-dropdown.scss";
 
-type Props = ReduxProps & RouteComponentProps;
-
-const CartDropdown: React.FC<Props> = ({ cartItems, hideDropdown, history }) => {
+const CartDropdown: React.FC = () => {
   console.log("CartDropdown is being re-rendered because cart items changed");
+  const cartItems = useSelector((state: Store) => state.cart.cartItems);
+  const dispatch = useDispatch();
+  const history = useHistory();
+
   return (
     <div className="cart-dropdown">
       <div className="cart-items">
@@ -26,7 +27,7 @@ const CartDropdown: React.FC<Props> = ({ cartItems, hideDropdown, history }) => 
       <CustomButton
         onClick={() => {
           history.push("/checkout");
-          hideDropdown();
+          dispatch(toggleCartHidden());
         }}
       >
         GO TO CHECKOUT
@@ -35,14 +36,4 @@ const CartDropdown: React.FC<Props> = ({ cartItems, hideDropdown, history }) => 
   );
 };
 
-const mapStateToProps = ({ cart }: Store) => ({
-  cartItems: cart.cartItems,
-});
-
-const mapDispatchToProps = {
-  hideDropdown: toggleCartHidden,
-};
-
-const Connector = connect(mapStateToProps, mapDispatchToProps);
-
-export default withRouter(Connector(CartDropdown));
+export default CartDropdown;

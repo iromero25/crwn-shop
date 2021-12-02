@@ -22,7 +22,7 @@ export interface IShopData {
   items: IItem[];
 }
 
-type CollectionKeys = "hats" | "jackets" | "sneakers" | "mens" | "womens";
+export type CollectionKeys = "hats" | "jackets" | "sneakers" | "mens" | "womens";
 
 export type Collection = Record<CollectionKeys, IShopData>;
 

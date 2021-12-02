@@ -7,7 +7,9 @@ import {
 } from "../../components/types";
 import * as Types from "./types";
 
-export const checkUserSession = () => ({
+export interface ICheckUserSession extends Action<typeof Types.CHECK_USER_SESSION> {}
+
+export const checkUserSession = (): ICheckUserSession => ({
   type: Types.CHECK_USER_SESSION,
 });
 
