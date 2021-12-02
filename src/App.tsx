@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { Dispatch, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Switch, Route, Redirect } from "react-router-dom";
 
@@ -11,10 +11,11 @@ import { checkUserSession } from "./redux/user/user.actions";
 import { selectCurrentUser } from "./redux/user/user.selector";
 
 import "./App.css";
+import { Action } from "redux";
 
 const App: React.FC = () => {
   const currentUser = useSelector(selectCurrentUser);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<Dispatch<Action>>();
 
   useEffect(() => {
     dispatch(checkUserSession());
