@@ -1,5 +1,6 @@
 import firebase from "firebase/compat/app";
 import { all, put, takeEvery } from "redux-saga/effects";
+import { GenericError } from "../../components/types";
 import {
   FirebaseUser,
   auth,
@@ -9,8 +10,10 @@ import {
   signInWithGoogle,
   getCurrentUser,
 } from "../../firebase/firebase.utils";
+import { fetchUserCart } from "../cart/cart.actions";
 import {
   CHECK_USER_SESSION,
+  SIGN_IN_SUCCESS,
   SIGN_OUT_START,
   SIGN_UP_START,
   START_EMAIL_SIGN_IN,
@@ -24,10 +27,9 @@ import {
   signOutFailure,
   ISignUpStartAction,
   signUpFailure,
-  startEmailSignIn,
+  ISignInSuccess,
 } from "./user.actions";
 
-type GenericError = any & { message: string };
 type AuthUserCredential = firebase.auth.UserCredential;
 
 function* isUserAuthenticated() {
@@ -122,6 +124,16 @@ function* onSignUpStart() {
   yield takeEvery(SIGN_UP_START, signUp);
 }
 
+function* fetchUserCartSaga(action: ISignInSuccess) {
+  // once we know the user is authenticated (signed in),
+  // we can fetch the user's cart
+  yield put(fetchUserCart(action.payload.id));
+}
+
+function* onSignIn() {
+  yield takeEvery(SIGN_IN_SUCCESS, fetchUserCartSaga);
+}
+
 export default function* userSagas() {
   yield all([
     googleSignInStart(),
@@ -129,5 +141,6 @@ export default function* userSagas() {
     onCheckUserSession(),
     onSignOutStart(),
     onSignUpStart(),
+    onSignIn(),
   ]);
 }

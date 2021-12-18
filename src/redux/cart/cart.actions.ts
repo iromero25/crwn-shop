@@ -2,6 +2,7 @@ import {
   ADD_CART_ITEM,
   CLEAR_CART,
   DECREASE_CART_ITEM_QTY,
+  FETCH_USER_CART,
   REMOVE_CART_ITEM,
   TOGGLE_CART_HIDDEN,
   UPDATE_CART,
@@ -55,4 +56,13 @@ export interface IDecreaseItemQty extends Action<typeof DECREASE_CART_ITEM_QTY> 
 export const decreaseItemQty = (cartItem: IItem): IDecreaseItemQty => ({
   type: DECREASE_CART_ITEM_QTY,
   payload: cartItem,
+});
+
+export interface IFetchUserCart extends Action<typeof FETCH_USER_CART> {
+  payload: string;
+}
+
+export const fetchUserCart = (userId: string): IFetchUserCart => ({
+  type: FETCH_USER_CART,
+  payload: userId,
 });

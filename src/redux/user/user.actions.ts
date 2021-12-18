@@ -4,6 +4,7 @@ import {
   Error,
   IEmailAndPassword,
   ICredentials,
+  ICurrentUser,
 } from "../../components/types";
 import * as Types from "./types";
 
@@ -47,12 +48,12 @@ export const startGoogleSignIn = () => ({
 });
 
 export interface ISignInSuccess extends Action<typeof Types.SIGN_IN_SUCCESS> {
-  payload: CurrentUser;
+  payload: ICurrentUser;
 }
 
 export const signInSuccess = (user: CurrentUser): ISignInSuccess => ({
   type: Types.SIGN_IN_SUCCESS,
-  payload: user,
+  payload: user as ICurrentUser,
 });
 
 export interface ISignInFailed extends Action<typeof Types.SIGN_IN_FAILURE> {
