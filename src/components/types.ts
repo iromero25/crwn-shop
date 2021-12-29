@@ -1,6 +1,6 @@
 import firebase from "firebase/compat";
 
-export type CurrentUser = firebase.firestore.DocumentData | null; // do we need this?
+export type CurrentUser = firebase.firestore.DocumentData | null;
 export type Error = string | null;
 
 export interface ICurrentUser {

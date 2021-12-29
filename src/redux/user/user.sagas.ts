@@ -1,6 +1,6 @@
 import firebase from "firebase/compat/app";
-import { all, put, takeEvery } from "redux-saga/effects";
-import { GenericError } from "../../components/types";
+import { all, put, takeEvery, select } from "redux-saga/effects";
+import { GenericError, IItem } from "../../components/types";
 import {
   FirebaseUser,
   auth,
@@ -9,8 +9,10 @@ import {
   DocumentSnapshotType,
   signInWithGoogle,
   getCurrentUser,
+  updateDBCart,
 } from "../../firebase/firebase.utils";
-import { fetchUserCart } from "../cart/cart.actions";
+import { fetchCartFromDB } from "../cart/cart.actions";
+import { selectCartItems } from "../cart/cart.selectors";
 import {
   CHECK_USER_SESSION,
   SIGN_IN_SUCCESS,
@@ -124,14 +126,23 @@ function* onSignUpStart() {
   yield takeEvery(SIGN_UP_START, signUp);
 }
 
-function* fetchUserCartSaga(action: ISignInSuccess) {
-  // once we know the user is authenticated (signed in),
-  // we can fetch the user's cart
-  yield put(fetchUserCart(action.payload.id));
+function* fetchUserCartSaga(userId: string) {
+  yield put(fetchCartFromDB(userId));
+}
+
+function* saveItemsInStoreIntoDB(userId: string) {
+  const currentItems: IItem[] = yield select(selectCartItems);
+  yield updateDBCart(userId, currentItems);
+}
+
+function* onSignInSuccess(action: ISignInSuccess) {
+  const userId = action.payload.id;
+  yield saveItemsInStoreIntoDB(userId);
+  yield fetchUserCartSaga(userId);
 }
 
 function* onSignIn() {
-  yield takeEvery(SIGN_IN_SUCCESS, fetchUserCartSaga);
+  yield takeEvery(SIGN_IN_SUCCESS, onSignInSuccess);
 }
 
 export default function* userSagas() {

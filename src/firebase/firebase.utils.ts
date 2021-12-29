@@ -1,7 +1,7 @@
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import "firebase/compat/auth";
-import { Collection } from "../components/types";
+import { Collection, IItem } from "../components/types";
 
 const config = {
   apiKey: "AIzaSyCjflNtWx1LkoDxAfKLvzN5qBIpQUjGANo",
@@ -53,6 +53,44 @@ export const createUserProfileDocument = async (
   }
 
   return userRef;
+};
+
+export const getCurrrentCartFromDb = async (userId: string): Promise<IItem[]> => {
+  const cartItemRef = firestore.doc(`cartItems/${userId}`);
+  const snapshot = await cartItemRef.get();
+  const currentCart: IItem[] = snapshot.exists ? snapshot.data()?.currentCart ?? [] : [];
+  return currentCart;
+};
+
+// Example on how to modify the database in an atomic fashion
+// that includes reading and updating:
+export const updateDBCart = (userId: string, items: IItem[]) => {
+  const cartItemsRef = firestore.collection("cartItems").doc(userId);
+
+  return firestore.runTransaction(async transaction => {
+    const snapshot = await transaction.get(cartItemsRef);
+    const currentCart: IItem[] = snapshot.exists
+      ? snapshot.data()?.currentCart ?? []
+      : [];
+    const newCartItem = [...currentCart, ...items];
+
+    transaction.update(cartItemsRef, {
+      currentCart: newCartItem,
+    });
+  });
+};
+
+export const replaceDBCart = async (userId: string, newCart: IItem[]) => {
+  const cartItemsRef = firestore.collection("cartItems").doc(userId);
+  await cartItemsRef.update({
+    currentCart: newCart,
+  });
+  // example on how to simulate throwing an asynchronous error:
+  // return new Promise((resolve, reject) => {
+  //   setTimeout(() => {
+  //     reject("some error");
+  //   }, 1500);
+  // });
 };
 
 export const addCollectionAndDocuments = async (

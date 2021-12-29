@@ -1,5 +1,5 @@
-import { TOGGLE_CART_HIDDEN, CLEAR_CART, UPDATE_CART } from "./cart.types";
-import { IToggleCartHiddenAction, IClearCart, IUpdateCart } from "./cart.actions";
+import { TOGGLE_CART_HIDDEN, CLEAR_CART, UPDATE_CART_FROM_DB } from "./cart.types";
+import { IToggleCartHiddenAction, IClearCart, IUpdateCartFromDB } from "./cart.actions";
 import { ICart } from "../../components/types";
 
 const initialState: ICart = {
@@ -9,7 +9,7 @@ const initialState: ICart = {
 
 const cartReducer = (
   currentState = initialState,
-  action: IToggleCartHiddenAction | IClearCart | IUpdateCart
+  action: IToggleCartHiddenAction | IClearCart | IUpdateCartFromDB
 ) => {
   const { isCartHidden } = currentState;
 
@@ -23,7 +23,7 @@ const cartReducer = (
     case TOGGLE_CART_HIDDEN:
       return { ...currentState, isCartHidden: !isCartHidden };
 
-    case UPDATE_CART:
+    case UPDATE_CART_FROM_DB:
       return {
         ...currentState,
         cartItems: [...action.payload],

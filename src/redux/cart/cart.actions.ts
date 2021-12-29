@@ -2,10 +2,10 @@ import {
   ADD_CART_ITEM,
   CLEAR_CART,
   DECREASE_CART_ITEM_QTY,
-  FETCH_USER_CART,
+  FETCH_CART_FROM_DB,
   REMOVE_CART_ITEM,
   TOGGLE_CART_HIDDEN,
-  UPDATE_CART,
+  UPDATE_CART_FROM_DB,
 } from "./cart.types";
 import { Action } from "redux";
 import { IItem } from "../../components/types";
@@ -31,12 +31,12 @@ export const addCartItem = (cartItem: IItem): IAddCartItemAction => ({
   payload: cartItem,
 });
 
-export interface IUpdateCart extends Action<typeof UPDATE_CART> {
+export interface IUpdateCartFromDB extends Action<typeof UPDATE_CART_FROM_DB> {
   payload: IItem[];
 }
 
-export const updateCart = (cart: IItem[]): IUpdateCart => ({
-  type: UPDATE_CART,
+export const updateCartFromDB = (cart: IItem[]): IUpdateCartFromDB => ({
+  type: UPDATE_CART_FROM_DB,
   payload: cart,
 });
 
@@ -58,11 +58,11 @@ export const decreaseItemQty = (cartItem: IItem): IDecreaseItemQty => ({
   payload: cartItem,
 });
 
-export interface IFetchUserCart extends Action<typeof FETCH_USER_CART> {
+export interface IFetchCartFromDB extends Action<typeof FETCH_CART_FROM_DB> {
   payload: string;
 }
 
-export const fetchUserCart = (userId: string): IFetchUserCart => ({
-  type: FETCH_USER_CART,
+export const fetchCartFromDB = (userId: string): IFetchCartFromDB => ({
+  type: FETCH_CART_FROM_DB,
   payload: userId,
 });

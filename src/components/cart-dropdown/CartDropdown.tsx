@@ -10,7 +10,6 @@ import { toggleCartHidden } from "../../redux/cart/cart.actions";
 import "./cart-dropdown.scss";
 
 const CartDropdown: React.FC = () => {
-  console.log("CartDropdown is being re-rendered because cart items changed");
   const cartItems = useSelector((state: Store) => state.cart.cartItems);
   const dispatch = useDispatch();
   const history = useHistory();
