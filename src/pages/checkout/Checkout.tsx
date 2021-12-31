@@ -5,6 +5,7 @@ import { selectCartItems, selectCartTotal } from "../../redux/cart/cart.selector
 import { Store } from "../../redux/root-reducer";
 
 import "./checkout.scss";
+import StripeCheckoutButton from "../../components/stripe-button/StripeButton";
 
 interface ReduxProps extends ConnectedProps<typeof Connector> {}
 
@@ -33,6 +34,12 @@ const CheckoutPage: React.FC<ReduxProps> = ({ cartItems, cartTotal }) => (
     <div className="total">
       <span>Total: ${cartTotal}</span>
     </div>
+    <div className="test-warning">
+      *Please use the followiing test credit card for payments*
+      <br />
+      4242 4242 4242 4242 - Exp: 01/23 - CVV: 123
+    </div>
+    <StripeCheckoutButton price={cartTotal} />
   </div>
 );
 
