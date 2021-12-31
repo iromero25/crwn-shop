@@ -9,15 +9,12 @@ import "./cart-icon.scss";
 
 interface ReduxProps extends ConnectedProps<typeof Connector> {}
 
-const CartIcon: React.FC<ReduxProps> = ({ itemCount, toggleCartHidden }) => {
-  console.log(" I am being invoked");
-  return (
-    <div className="cart-icon" onClick={toggleCartHidden}>
-      <ShoppingIcon className="shopping-icon" />
-      <span className="item-count">{itemCount}</span>
-    </div>
-  );
-};
+const CartIcon: React.FC<ReduxProps> = ({ itemCount, toggleCartHidden }) => (
+  <div className="cart-icon" onClick={toggleCartHidden}>
+    <ShoppingIcon className="shopping-icon" />
+    <span className="item-count">{itemCount}</span>
+  </div>
+);
 
 const mapStateToProps = (state: Store) => ({
   // this is just an example on how  to use selectors: one of the

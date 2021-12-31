@@ -1,19 +1,6 @@
-import {
-  ADD_CART_ITEM,
-  REMOVE_CART_ITEM,
-  DECREASE_CART_ITEM_QTY,
-  TOGGLE_CART_HIDDEN,
-  CLEAR_CART,
-} from "./types";
-import {
-  IAddCartItemAction,
-  IRemoveCartItemAction,
-  IToggleCartHiddenAction,
-  IDecreaseItemQty,
-  IClearCart,
-} from "./cart.actions";
+import { TOGGLE_CART_HIDDEN, CLEAR_CART, UPDATE_CART_FROM_DB } from "./cart.types";
+import { IToggleCartHiddenAction, IClearCart, IUpdateCartFromDB } from "./cart.actions";
 import { ICart } from "../../components/types";
-import { addItemToCart, removeItemFromCart, decreaseItemFromCart } from "./cart.utils";
 
 const initialState: ICart = {
   isCartHidden: true,
@@ -22,14 +9,9 @@ const initialState: ICart = {
 
 const cartReducer = (
   currentState = initialState,
-  action:
-    | IToggleCartHiddenAction
-    | IAddCartItemAction
-    | IRemoveCartItemAction
-    | IDecreaseItemQty
-    | IClearCart
+  action: IToggleCartHiddenAction | IClearCart | IUpdateCartFromDB
 ) => {
-  const { cartItems, isCartHidden } = currentState;
+  const { isCartHidden } = currentState;
 
   switch (action.type) {
     case CLEAR_CART:
@@ -41,22 +23,10 @@ const cartReducer = (
     case TOGGLE_CART_HIDDEN:
       return { ...currentState, isCartHidden: !isCartHidden };
 
-    case ADD_CART_ITEM:
+    case UPDATE_CART_FROM_DB:
       return {
         ...currentState,
-        cartItems: addItemToCart(action.payload, cartItems),
-      };
-
-    case REMOVE_CART_ITEM:
-      return {
-        ...currentState,
-        cartItems: removeItemFromCart(action.payload, cartItems),
-      };
-
-    case DECREASE_CART_ITEM_QTY:
-      return {
-        ...currentState,
-        cartItems: decreaseItemFromCart(action.payload, cartItems),
+        cartItems: [...action.payload],
       };
 
     default:

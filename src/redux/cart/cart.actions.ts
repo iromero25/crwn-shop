@@ -2,9 +2,11 @@ import {
   ADD_CART_ITEM,
   CLEAR_CART,
   DECREASE_CART_ITEM_QTY,
+  FETCH_CART_FROM_DB,
   REMOVE_CART_ITEM,
   TOGGLE_CART_HIDDEN,
-} from "./types";
+  UPDATE_CART_FROM_DB,
+} from "./cart.types";
 import { Action } from "redux";
 import { IItem } from "../../components/types";
 
@@ -29,6 +31,15 @@ export const addCartItem = (cartItem: IItem): IAddCartItemAction => ({
   payload: cartItem,
 });
 
+export interface IUpdateCartFromDB extends Action<typeof UPDATE_CART_FROM_DB> {
+  payload: IItem[];
+}
+
+export const updateCartFromDB = (cart: IItem[]): IUpdateCartFromDB => ({
+  type: UPDATE_CART_FROM_DB,
+  payload: cart,
+});
+
 export interface IRemoveCartItemAction extends Action<typeof REMOVE_CART_ITEM> {
   payload: IItem;
 }
@@ -45,4 +56,13 @@ export interface IDecreaseItemQty extends Action<typeof DECREASE_CART_ITEM_QTY> 
 export const decreaseItemQty = (cartItem: IItem): IDecreaseItemQty => ({
   type: DECREASE_CART_ITEM_QTY,
   payload: cartItem,
+});
+
+export interface IFetchCartFromDB extends Action<typeof FETCH_CART_FROM_DB> {
+  payload: string;
+}
+
+export const fetchCartFromDB = (userId: string): IFetchCartFromDB => ({
+  type: FETCH_CART_FROM_DB,
+  payload: userId,
 });

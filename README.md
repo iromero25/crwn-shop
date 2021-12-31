@@ -4,6 +4,10 @@ Single Page Application using the React library to power a clothing e-commerce s
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Documented Logic
+
+Item storing and handling explained [here](./Storing.md).
+
 ## Available Scripts
 
 In the project directory, you can run:
