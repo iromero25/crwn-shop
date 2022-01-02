@@ -11,8 +11,24 @@ const StripeCheckoutButton: React.FC<Props> = ({ price }) => {
     "pk_test_51KCqB4JM5mCqSn1CwV3kU5sCFaJS1sA5yxIfS412ad3n7F9P0pJTHfTna0ZapNHPNCZiKHhHYrciUUDpO92NOJWK00CT2LtynJ";
 
   const onToken = (token: Token) => {
-    console.log(token);
-    alert("Payment successful");
+    fetch("/payment", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        amount: priceForStripe,
+        token,
+      }),
+    })
+      .then(response => {
+        alert("Payment successfull");
+      })
+      .catch(error => {
+        alert(
+          "There was an issue with your payment. Please make sure you use the provided credit card."
+        );
+      });
   };
 
   return (
