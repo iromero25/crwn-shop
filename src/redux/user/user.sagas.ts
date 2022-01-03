@@ -1,6 +1,6 @@
 import firebase from "firebase/compat/app";
 import { all, put, takeEvery, select } from "redux-saga/effects";
-import { GenericError, IItem } from "../../components/types";
+import { GenericError, ICurrentUser, IItem } from "../../components/types";
 import {
   FirebaseUser,
   auth,
@@ -20,7 +20,7 @@ import {
   SIGN_UP_START,
   START_EMAIL_SIGN_IN,
   START_GOOGLE_SIGN_IN,
-} from "./types";
+} from "./user.types";
 import {
   signInSuccess,
   IStartEmailSignInAction,
@@ -30,15 +30,26 @@ import {
   ISignUpStartAction,
   signUpFailure,
   ISignInSuccess,
+  userIsAuthenticated,
 } from "./user.actions";
 
 type AuthUserCredential = firebase.auth.UserCredential;
 
+function* onUserAuthenticated(user: ICurrentUser) {
+  yield put(userIsAuthenticated(user)); // this sets up the authenticated user in the store
+  yield fetchUserCartSaga(user.id); // fetch the shop cart for the authenticated user
+}
+
+// when a user is authenticated, we do not want to do the same thing as signing in;
+// (i.e. we do not want to add the existing items in the store to the DB like we do
+// when signing in), instead, we just set the user in the store and fetch the items
 function* isUserAuthenticated() {
   try {
     const userAuth: FirebaseUser = yield getCurrentUser();
     if (!userAuth) return;
-    yield getSnapshotFromUserAuth(userAuth);
+    const userSnapshot: DocumentSnapshotType = yield getSnapshotFromUserAuth(userAuth);
+    const user = { id: userSnapshot.id, ...userSnapshot.data() } as ICurrentUser;
+    yield onUserAuthenticated(user);
   } catch (error: GenericError) {
     yield put(signInFailed(error.message));
   }
@@ -61,6 +72,21 @@ function* onSignOutStart() {
   yield takeEvery(SIGN_OUT_START, signOut);
 }
 
+function* getSnapshotFromUserAuthAndSignIn(
+  user: AuthUserCredential["user"],
+  additionalData?: Record<string, any>
+) {
+  try {
+    const userSnapshot: DocumentSnapshotType = yield getSnapshotFromUserAuth(
+      user,
+      additionalData
+    );
+    yield put(signInSuccess({ id: userSnapshot.id, ...userSnapshot.data() }));
+  } catch (error: GenericError) {
+    yield put(signInFailed(error.message));
+  }
+}
+
 function* getSnapshotFromUserAuth(
   user: AuthUserCredential["user"],
   additionalData?: Record<string, any>
@@ -71,7 +97,7 @@ function* getSnapshotFromUserAuth(
       additionalData
     );
     const userSnapshot: DocumentSnapshotType = yield userRef.get();
-    yield put(signInSuccess({ id: userSnapshot.id, ...userSnapshot.data() }));
+    return userSnapshot;
   } catch (error: GenericError) {
     yield put(signInFailed(error.message));
   }
@@ -85,14 +111,14 @@ function* signInWithEmailAndPassword({
       email,
       password
     );
-    yield getSnapshotFromUserAuth(user);
+    yield getSnapshotFromUserAuthAndSignIn(user);
   } catch (error: GenericError) {}
 }
 
 function* signInWithGoogleSaga() {
   try {
     const { user }: AuthUserCredential = yield signInWithGoogle();
-    yield getSnapshotFromUserAuth(user);
+    yield getSnapshotFromUserAuthAndSignIn(user);
   } catch (error: GenericError) {
     yield put(signInFailed(error.message));
   }
@@ -116,7 +142,7 @@ function* signUp(action: ISignUpStartAction) {
       email,
       password
     );
-    yield getSnapshotFromUserAuth(user, { displayName });
+    yield getSnapshotFromUserAuthAndSignIn(user, { displayName });
   } catch (error: GenericError) {
     yield put(signUpFailure(error.message));
   }

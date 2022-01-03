@@ -4,13 +4,15 @@ import {
   SIGN_OUT_FAILURE,
   SIGN_OUT_SUCCESS,
   SIGN_UP_FAILURE,
-} from "./types";
+  USER_AUTHENTICATED,
+} from "./user.types";
 import {
   ISignInSuccess,
   ISignInFailed,
   ISignOutFailure,
   ISignOutSuccess,
   ISignUpFailureAction,
+  IUserIsAuthenticated,
 } from "./user.actions";
 import { CurrentUser, Error } from "../../components/types";
 
@@ -32,6 +34,7 @@ const userReducer = (
     | ISignOutFailure
     | ISignOutSuccess
     | ISignUpFailureAction
+    | IUserIsAuthenticated
 ) => {
   switch (action.type) {
     case SIGN_OUT_SUCCESS:
@@ -42,6 +45,7 @@ const userReducer = (
       };
 
     case SIGN_IN_SUCCESS:
+    case USER_AUTHENTICATED:
       return {
         ...currentState,
         currentUser: action.payload,
