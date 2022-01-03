@@ -1,4 +1,5 @@
 import React from "react";
+import { toast } from "react-toastify";
 import StripeCheckout, { Token } from "react-stripe-checkout";
 
 interface Props {
@@ -22,11 +23,11 @@ const StripeCheckoutButton: React.FC<Props> = ({ price }) => {
       }),
     })
       .then(response => {
-        alert("Payment successfull");
+        toast.success("Payment successfull");
       })
       .catch(error => {
-        alert(
-          "There was an issue with your payment. Please make sure you use the provided credit card."
+        toast.error(
+          '"There was an issue with your payment. Please make sure you use the provided credit card."'
         );
       });
   };

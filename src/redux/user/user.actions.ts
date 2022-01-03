@@ -6,7 +6,7 @@ import {
   ICredentials,
   ICurrentUser,
 } from "../../components/types";
-import * as Types from "./types";
+import * as Types from "./user.types";
 
 export const checkUserSession = () => ({
   type: Types.CHECK_USER_SESSION,
@@ -53,6 +53,15 @@ export interface ISignInSuccess extends Action<typeof Types.SIGN_IN_SUCCESS> {
 
 export const signInSuccess = (user: CurrentUser): ISignInSuccess => ({
   type: Types.SIGN_IN_SUCCESS,
+  payload: user as ICurrentUser,
+});
+
+export interface IUserIsAuthenticated extends Action<typeof Types.USER_AUTHENTICATED> {
+  payload: ICurrentUser;
+}
+
+export const userIsAuthenticated = (user: CurrentUser): IUserIsAuthenticated => ({
+  type: Types.USER_AUTHENTICATED,
   payload: user as ICurrentUser,
 });
 

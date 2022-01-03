@@ -1,6 +1,8 @@
 import React, { Dispatch, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Switch, Route, Redirect } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Shop from "./pages/shop/Shop";
 import Header from "./components/header/Header";
@@ -33,6 +35,12 @@ const App: React.FC = () => {
           render={() => (currentUser ? <Redirect to="/" /> : <SignInAndSignOut />)}
         />
       </Switch>
+      <ToastContainer
+        autoClose={4000}
+        hideProgressBar
+        toastStyle={{ backgroundColor: "black" }}
+        bodyStyle={{ color: "white" }}
+      />
     </>
   );
 };
