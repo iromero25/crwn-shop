@@ -8,8 +8,17 @@ import {
 } from "../../components/types";
 import * as Types from "./user.types";
 
-export const checkUserSession = () => ({
+export interface ICheckUSerSession extends Action<typeof Types.CHECK_USER_SESSION> {}
+
+export const checkUserSession = (): ICheckUSerSession => ({
   type: Types.CHECK_USER_SESSION,
+});
+
+export interface IFinishCheckUSerSession
+  extends Action<typeof Types.FINISH_CHECK_USER_SESSION> {}
+
+export const finishCheckUserSession = (): IFinishCheckUSerSession => ({
+  type: Types.FINISH_CHECK_USER_SESSION,
 });
 
 export const signOutStart = () => ({

@@ -10,10 +10,18 @@ import { selectIsCartHidden } from "../../redux/cart/cart.selectors";
 import { signOutStart } from "../../redux/user/user.actions";
 
 import "./header.scss";
+import WithSpinner from "../with-spinner/WithSpinner";
+
+const CartIconWithSpinner = WithSpinner(CartIcon);
 
 interface ReduxProps extends ConnectedProps<typeof Connector> {}
 
-const Header: React.FC<ReduxProps> = ({ currentUser, isCartHidden, signOutStart }) => (
+const Header: React.FC<ReduxProps> = ({
+  currentUser,
+  isCartHidden,
+  checkingUserSession,
+  signOutStart,
+}) => (
   <div className="header">
     <Link to="/">
       <Logo className="logo" />
@@ -34,13 +42,18 @@ const Header: React.FC<ReduxProps> = ({ currentUser, isCartHidden, signOutStart 
           SIGN IN
         </Link>
       )}
-      <CartIcon />
+      <CartIconWithSpinner
+        isLoading={checkingUserSession}
+        widthOverlay={9}
+        widthAndHeigth={18}
+      />
     </div>
     {isCartHidden ? null : <CartDropdown />}
   </div>
 );
 
 const mapStateToProps = (state: Store) => ({
+  checkingUserSession: state.user.checkingUserSession,
   currentUser: selectCurrentUser(state),
   isCartHidden: selectIsCartHidden(state),
 });

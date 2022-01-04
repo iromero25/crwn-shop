@@ -1,17 +1,17 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
-export const SpinnerOverlay = styled.div`
+export const SpinnerOverlay = styled.div<{ widthOverlay?: number }>`
   height: 60vh;
-  width: 100%;
+  width: ${({ widthOverlay }) => widthOverlay || 100}%;
   display: flex;
   justify-content: center;
   align-items: center;
 `;
 
-export const SpinnerContainer = styled.div`
+export const SpinnerContainer = styled.div<{ widthAndHeight?: number }>`
   display: inline-block;
-  width: 50px;
-  height: 50px;
+  width: ${({ widthAndHeight }) => widthAndHeight || 50}px;
+  height: ${({ widthAndHeight }) => widthAndHeight || 50}px;
   border: 3px solid rgba(195, 195, 195, 0.6);
   border-radius: 50%;
   border-top-color: #636767;

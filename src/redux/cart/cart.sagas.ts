@@ -1,5 +1,5 @@
 import { all, put, takeEvery, takeLatest, select } from "redux-saga/effects";
-import { GenericError, ICurrentUser, IItem } from "../../components/types";
+import { ICurrentUser, IItem } from "../../components/types";
 import { getCurrrentCartFromDb, replaceDBCart } from "../../firebase/firebase.utils";
 import { SIGN_OUT_SUCCESS } from "../user/user.types";
 import { selectCurrentUser } from "../user/user.selector";
@@ -45,7 +45,7 @@ function* modifyShoppingCart(
     try {
       // update the DB only if the user is logged in
       yield replaceDBCart(currentUser.id, newCart);
-    } catch (error: GenericError) {
+    } catch {
       toast.error("Error trying to modify the shopping cart. Please try again.");
       // Revert the contents of the store on fail WITH the actual content of
       // the items in the DB:

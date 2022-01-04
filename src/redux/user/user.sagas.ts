@@ -31,6 +31,7 @@ import {
   signUpFailure,
   ISignInSuccess,
   userIsAuthenticated,
+  finishCheckUserSession,
 } from "./user.actions";
 
 type AuthUserCredential = firebase.auth.UserCredential;
@@ -55,8 +56,13 @@ function* isUserAuthenticated() {
   }
 }
 
+function* onCheckUserSessionSaga() {
+  yield isUserAuthenticated();
+  yield put(finishCheckUserSession());
+}
+
 function* onCheckUserSession() {
-  yield takeEvery(CHECK_USER_SESSION, isUserAuthenticated);
+  yield takeEvery(CHECK_USER_SESSION, onCheckUserSessionSaga);
 }
 
 function* signOut() {
@@ -112,7 +118,9 @@ function* signInWithEmailAndPassword({
       password
     );
     yield getSnapshotFromUserAuthAndSignIn(user);
-  } catch (error: GenericError) {}
+  } catch (error: GenericError) {
+    yield put(signInFailed(error.message));
+  }
 }
 
 function* signInWithGoogleSaga() {
