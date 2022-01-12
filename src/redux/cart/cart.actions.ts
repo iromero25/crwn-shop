@@ -4,6 +4,7 @@ import {
   DECREASE_CART_ITEM_QTY,
   FETCH_CART_FROM_DB,
   REMOVE_CART_ITEM,
+  MOVE_CART_TO_HISTORY,
   TOGGLE_CART_HIDDEN,
   UPDATE_CART_FROM_DB,
 } from "./cart.types";
@@ -65,4 +66,10 @@ export interface IFetchCartFromDB extends Action<typeof FETCH_CART_FROM_DB> {
 export const fetchCartFromDB = (userId: string): IFetchCartFromDB => ({
   type: FETCH_CART_FROM_DB,
   payload: userId,
+});
+
+export interface IMoveCartToHistory extends Action<typeof MOVE_CART_TO_HISTORY> {}
+
+export const moveCartToHistory = () => ({
+  type: MOVE_CART_TO_HISTORY,
 });

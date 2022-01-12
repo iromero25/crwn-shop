@@ -18,6 +18,18 @@ export interface IItem {
   quantity?: number;
 }
 
+export interface ICartHistory {
+  [index: string]: {
+    storedAt: Date;
+    purchasedItems: IItem[];
+  };
+}
+
+export interface ICartItemsCollection {
+  currentCart: IItem[];
+  cartHistory?: ICartHistory;
+}
+
 export interface ICart {
   isCartHidden: boolean;
   cartItems: IItem[];
