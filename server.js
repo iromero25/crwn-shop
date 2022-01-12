@@ -43,14 +43,17 @@ app.post("/payment", (req, res) => {
     amount: req.body.amount,
     currency: "usd",
   };
-
-  stripe.charges.create(body, (stripeErr, stripeRes) => {
-    if (stripeErr) {
-      res.status(500).send({ error: stripeErr });
-    } else {
-      res.status(200).send({ sucess: stripeRes });
-    }
-  });
+  if (process.env.NODE_ENV !== "production") {
+    res.status(200).send({ sucess: "success" });
+  } else {
+    stripe.charges.create(body, (stripeErr, stripeRes) => {
+      if (stripeErr) {
+        res.status(500).send({ error: stripeErr });
+      } else {
+        res.status(200).send({ sucess: stripeRes });
+      }
+    });
+  }
 });
 
 app.listen(port, error => {
