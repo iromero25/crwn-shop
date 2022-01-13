@@ -1,6 +1,11 @@
 import firebase from "firebase/compat/app";
 import { all, put, takeEvery, select } from "redux-saga/effects";
-import { GenericError, ICurrentUser, IItem } from "../../components/types";
+import {
+  GenericError,
+  ICartItemsCollection,
+  ICurrentUser,
+  IItem,
+} from "../../components/types";
 import {
   FirebaseUser,
   auth,
@@ -166,7 +171,10 @@ function* fetchUserCartSaga(userId: string) {
 
 function* saveItemsInStoreIntoDB(userId: string) {
   const currentItems: IItem[] = yield select(selectCartItems);
-  yield updateDBCart(userId, currentItems);
+  const cartItemsCollection: ICartItemsCollection = {
+    currentCart: currentItems,
+  };
+  yield updateDBCart(userId, cartItemsCollection);
 }
 
 function* onSignInSuccess(action: ISignInSuccess) {

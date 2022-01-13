@@ -1,26 +1,25 @@
+import { Action } from "redux";
 import { all, put, takeEvery, takeLatest, select } from "redux-saga/effects";
-import { ICurrentUser, IItem } from "../../components/types";
-import { getCurrrentCartFromDb, replaceDBCart } from "../../firebase/firebase.utils";
+import { ICartItemsCollection, ICurrentUser, IItem } from "../../components/types";
+import { getCartItemsCollection, updateDBCart } from "../../firebase/firebase.utils";
 import { SIGN_OUT_SUCCESS } from "../user/user.types";
 import { selectCurrentUser } from "../user/user.selector";
 import { toast } from "react-toastify";
+import { selectCartItems } from "./cart.selectors";
+import { databaseCartItemToUpdate } from "./cart.utils";
 import {
   clearCart,
   fetchCartFromDB,
-  IAddCartItemAction,
-  IDecreaseItemQty,
   IFetchCartFromDB,
-  IRemoveCartItemAction,
   updateCartFromDB,
 } from "./cart.actions";
-import { selectCartItems } from "./cart.selectors";
 import {
   ADD_CART_ITEM,
   DECREASE_CART_ITEM_QTY,
   FETCH_CART_FROM_DB,
   REMOVE_CART_ITEM,
+  MOVE_CART_TO_HISTORY,
 } from "./cart.types";
-import { createNewCartReducer } from "./cart.utils";
 
 function* clearCartOnSignOut() {
   yield put(clearCart());
@@ -30,37 +29,35 @@ function* onSignOutSuccess() {
   yield takeEvery(SIGN_OUT_SUCCESS, clearCartOnSignOut);
 }
 
-// to modify the shopping cart both at the store and at the DB in a sync fashion
-function* modifyShoppingCart(
-  action: IAddCartItemAction | IRemoveCartItemAction | IDecreaseItemQty
-) {
-  // use saga's select effect to extract the cart from the state
+// this will modify the shopping cart both at the store and at the DB in a sync fashion
+function* modifyShoppingCart(action: Action) {
   const currentCart: IItem[] = yield select(selectCartItems);
-  const newCart = createNewCartReducer(action, currentCart);
-  yield put(updateCartFromDB(newCart)); // modify the redux store
-
-  // use saga's select effect to extract the user from the state
   const currentUser: ICurrentUser = yield select(selectCurrentUser);
+  const newCartItemCollection = databaseCartItemToUpdate(currentCart, action);
+
+  // modify only the cart items (not the history) at the redux store:
+  yield put(updateCartFromDB(newCartItemCollection.currentCart));
+
   if (currentUser) {
     try {
       // update the DB only if the user is logged in
-      yield replaceDBCart(currentUser.id, newCart);
+      // this will replace the DB `cartItem` collection with the object passed as parameter
+      yield updateDBCart(currentUser.id, newCartItemCollection);
     } catch {
       toast.error("Error trying to modify the shopping cart. Please try again.");
       // Revert the contents of the store on fail WITH the actual content of
-      // the items in the DB:
+      // the items in the DB: (I think this is very clever!)
       yield put(fetchCartFromDB(currentUser.id));
     }
   }
 }
 
 function* onCartChange() {
-  // it is so much better  to  take the  latest  modification to the database
-  // (the saga will cancel the previous operation once it receives a new one)
-  // since we do not need to modify the DB every time an item is modified; we
-  // just need the last one
+  // it's better to take the latest modification to the DB (the saga will cancel
+  // the previous operation once it receives a new one): we don't need to modify
+  // the DB every time an item is modified; we just need the last one
   yield takeLatest(
-    [ADD_CART_ITEM, DECREASE_CART_ITEM_QTY, REMOVE_CART_ITEM],
+    [ADD_CART_ITEM, DECREASE_CART_ITEM_QTY, REMOVE_CART_ITEM, MOVE_CART_TO_HISTORY],
     modifyShoppingCart
   );
 }
@@ -68,7 +65,7 @@ function* onCartChange() {
 // do the asynchronous call to fetch the user's cart
 function* fetchUserCart(action: IFetchCartFromDB) {
   const userId = action.payload;
-  const currentCart: IItem[] = yield getCurrrentCartFromDb(userId);
+  const { currentCart }: ICartItemsCollection = yield getCartItemsCollection(userId);
   yield put(updateCartFromDB(currentCart));
 }
 
