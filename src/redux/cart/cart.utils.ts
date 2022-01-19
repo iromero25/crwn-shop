@@ -12,20 +12,31 @@ import {
   IMoveCartToHistory,
 } from "./cart.actions";
 import uniqid from "uniqid";
+import { cloneArrayOfObjects } from "../../utils/utils";
 
 export const removeItemFromCart = (cartItem: IItem, cartItems: IItem[]) => {
   return cartItems.filter(item => item.id !== cartItem.id);
 };
 
-export const addItemToCart = (cartItem: IItem, cartItems: IItem[]) => {
-  const cartItemInArray = cartItems.find(item => item.id === cartItem.id);
-  if (!cartItemInArray) {
-    return [...cartItems, { ...cartItem, quantity: 1 }];
-  }
+export const addItemToCart = (cartItemsToAdd: IItem[], existingCartItems: IItem[]) => {
+  // If `existingCartItems` is not properly cloned, then the redux store is not updated
+  // as expected as immutability is  not  respected: spreding an array of objects means
+  // that we are assigning the object REFERENCES into a different array, but the refs
+  // to the objects REMAIN. That's why we need to clone each object:
+  const existingCartCloned: IItem[] = cloneArrayOfObjects(existingCartItems);
 
-  return cartItems.map(item =>
-    item.id === cartItem.id ? { ...item, quantity: (item?.quantity ?? 0) + 1 } : item
-  );
+  cartItemsToAdd.forEach(cartItemToAdd => {
+    const itemToModifyIndex = existingCartCloned.findIndex(
+      item => item.id === cartItemToAdd.id
+    );
+    if (itemToModifyIndex > -1) {
+      existingCartCloned[itemToModifyIndex].quantity! += 1; // you are mutating the object
+    } else {
+      existingCartCloned.push({ ...cartItemToAdd, quantity: 1 });
+    }
+  });
+
+  return existingCartCloned;
 };
 
 export const decreaseItemFromCart = (cartItem: IItem, cartItems: IItem[]) => {
@@ -44,6 +55,7 @@ export const decreaseItemFromCart = (cartItem: IItem, cartItems: IItem[]) => {
 
 // this function returns the (cart) object that will be used to update
 // the `cartItems` collection at the database, THIS IS NOT A REDUCER:
+// refactor: I am not sure we really need this:
 export const databaseCartItemToUpdate = (
   currentCart: IItem[],
   action:
@@ -55,7 +67,8 @@ export const databaseCartItemToUpdate = (
   switch (action.type) {
     case ADD_CART_ITEM:
       return {
-        currentCart: addItemToCart(action.payload, currentCart),
+        currentCart: addItemToCart([action.payload], currentCart), // update this
+        //currentCart: addItemToCart(action.payload, currentCart), // update this
       };
 
     case DECREASE_CART_ITEM_QTY:

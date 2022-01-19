@@ -33,7 +33,7 @@ function* onSignOutSuccess() {
 function* modifyShoppingCart(action: Action) {
   const currentCart: IItem[] = yield select(selectCartItems);
   const currentUser: ICurrentUser = yield select(selectCurrentUser);
-  const newCartItemCollection = databaseCartItemToUpdate(currentCart, action);
+  const newCartItemCollection = databaseCartItemToUpdate(currentCart, action); // rename this
 
   // modify only the cart items (not the history) at the redux store:
   yield put(updateCartFromDB(newCartItemCollection.currentCart));

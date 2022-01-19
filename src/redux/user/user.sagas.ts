@@ -1,20 +1,12 @@
 import firebase from "firebase/compat/app";
 import { all, put, takeEvery, select } from "redux-saga/effects";
+import { GenericError, ICurrentUser, IItem } from "../../components/types";
 import {
-  GenericError,
-  ICartItemsCollection,
-  ICurrentUser,
-  IItem,
-} from "../../components/types";
-import {
-  FirebaseUser,
   auth,
   createUserProfileDocument,
-  DocumentRefType,
-  DocumentSnapshotType,
   signInWithGoogle,
   getCurrentUser,
-  updateDBCart,
+  addItemsIntoDBCurrentCart,
 } from "../../firebase/firebase.utils";
 import { fetchCartFromDB } from "../cart/cart.actions";
 import { selectCartItems } from "../cart/cart.selectors";
@@ -38,6 +30,11 @@ import {
   userIsAuthenticated,
   finishCheckUserSession,
 } from "./user.actions";
+import {
+  DocumentRefType,
+  DocumentSnapshotType,
+  FirebaseUser,
+} from "../../firebase/firebase.types";
 
 type AuthUserCredential = firebase.auth.UserCredential;
 
@@ -169,12 +166,11 @@ function* fetchUserCartSaga(userId: string) {
   yield put(fetchCartFromDB(userId));
 }
 
+// maybe this can be refactored
 function* saveItemsInStoreIntoDB(userId: string) {
   const currentItems: IItem[] = yield select(selectCartItems);
-  const cartItemsCollection: ICartItemsCollection = {
-    currentCart: currentItems,
-  };
-  yield updateDBCart(userId, cartItemsCollection);
+  yield addItemsIntoDBCurrentCart(userId, currentItems);
+  // yield put(addCartItem(currentItems[0])); // think of what needs to happen to have smomething like this working
 }
 
 function* onSignInSuccess(action: ISignInSuccess) {

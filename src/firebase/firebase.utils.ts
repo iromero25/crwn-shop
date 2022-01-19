@@ -1,9 +1,11 @@
 import firebase from "firebase/compat/app";
+import { runTransaction, doc } from "firebase/firestore";
 import "firebase/compat/firestore";
 import "firebase/compat/auth";
-import { Collection, ICartItemsCollection } from "../components/types";
+import { Collection, ICartItemsCollection, IItem } from "../components/types";
 
 import { FirebaseUser } from "./firebase.types";
+import { addItemToCart } from "../redux/cart/cart.utils";
 
 const config = {
   apiKey: "AIzaSyCjflNtWx1LkoDxAfKLvzN5qBIpQUjGANo",
@@ -56,8 +58,41 @@ export const getCartItemsCollection = async (
 ): Promise<ICartItemsCollection> => {
   const cartItemRef = firestore.doc(`cartItems/${userId}`);
   const snapshot = await cartItemRef.get();
-  const cartItemCollection = snapshot.exists ? snapshot.data() : {};
+  const cartItemCollection = snapshot.exists
+    ? snapshot.data()
+    : {
+        currentCart: [],
+      };
   return cartItemCollection as ICartItemsCollection;
+};
+
+/**
+ * This  function adds the items received as parameter into the existing
+ * cart in the database. In case we try adding an existing item, it adds
+ * it up to the total. This is an example on how to modify the database
+ * in an atomic fashion that includes reading and updating:
+ * @param userId
+ * @param items The items to be merged into the DB's current cart
+ */
+export const addItemsIntoDBCurrentCart = (userId: string, items: IItem[]) => {
+  const cartItemsRef = firestore.collection("cartItems").doc(userId);
+
+  return firestore.runTransaction(async transaction => {
+    const snapshot = await transaction.get(cartItemsRef);
+
+    if (!snapshot.exists) {
+      transaction.set(cartItemsRef, { currentCart: items });
+    } else {
+      const currentCart: IItem[] = snapshot.exists
+        ? snapshot.data()?.currentCart ?? []
+        : [];
+      const newCartItem = addItemToCart(items, currentCart);
+
+      transaction.update(cartItemsRef, {
+        currentCart: newCartItem,
+      });
+    }
+  });
 };
 
 /**
@@ -74,6 +109,12 @@ export const updateDBCart = async (
   await cartItemsRef.update(itemCartCollection);
 };
 
+/**
+ * I believe this was used to store the list of items in the DB.
+ * Not used by the existing logic.
+ * @param collectionKey
+ * @param objectsToAdd
+ */
 export const addCollectionAndDocuments = async (
   collectionKey: string,
   objectsToAdd: Collection
@@ -89,7 +130,7 @@ export const addCollectionAndDocuments = async (
     };
     batch.set(newDocRef, itemToStore);
   });
-  return await batch.commit(); // batch.commit is an asynchronous operation
+  return await batch.commit(); // this is an asynchronous operation
 };
 
 export const convertCollectionSnapshotToMap = (
@@ -125,21 +166,3 @@ export default firebase;
 //     reject("some error");
 //   }, 1500);
 // });
-
-// Example on how to modify the database in an atomic fashion
-// that includes reading and updating:
-// export const updateDBCart = (userId: string, items: IItem[]) => {
-//   const cartItemsRef = firestore.collection("cartItems").doc(userId);
-
-//   return firestore.runTransaction(async transaction => {
-//     const snapshot = await transaction.get(cartItemsRef);
-//     const currentCart: IItem[] = snapshot.exists
-//       ? snapshot.data()?.currentCart ?? []
-//       : [];
-//     const newCartItem = [...currentCart, ...items];
-
-//     transaction.update(cartItemsRef, {
-//       currentCart: newCartItem,
-//     });
-//   });
-// };
