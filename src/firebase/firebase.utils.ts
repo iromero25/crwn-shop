@@ -1,5 +1,4 @@
 import firebase from "firebase/compat/app";
-import { runTransaction, doc } from "firebase/firestore";
 import "firebase/compat/firestore";
 import "firebase/compat/auth";
 import { Collection, ICartItemsCollection, IItem } from "../components/types";
@@ -58,6 +57,8 @@ export const getCartItemsCollection = async (
 ): Promise<ICartItemsCollection> => {
   const cartItemRef = firestore.doc(`cartItems/${userId}`);
   const snapshot = await cartItemRef.get();
+  // testing candidate: if we return an empty object ({}) then logging in for
+  // the first time for a user that has no data in the database, fails. Test this!
   const cartItemCollection = snapshot.exists
     ? snapshot.data()
     : {

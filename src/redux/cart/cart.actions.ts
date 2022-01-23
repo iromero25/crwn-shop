@@ -7,9 +7,11 @@ import {
   MOVE_CART_TO_HISTORY,
   TOGGLE_CART_HIDDEN,
   UPDATE_CART_FROM_DB,
+  START_PAYMENT_PROCESS,
 } from "./cart.types";
 import { Action } from "redux";
 import { IItem } from "../../components/types";
+import { Token } from "react-stripe-checkout";
 
 export interface IClearCart extends Action<typeof CLEAR_CART> {}
 
@@ -72,4 +74,22 @@ export interface IMoveCartToHistory extends Action<typeof MOVE_CART_TO_HISTORY> 
 
 export const moveCartToHistory = () => ({
   type: MOVE_CART_TO_HISTORY,
+});
+
+export interface IStartPaymentAction extends Action<typeof START_PAYMENT_PROCESS> {
+  payload: {
+    priceForStripe: number;
+    token: Token;
+  };
+}
+
+export const startPaymentProcess = (
+  priceForStripe: number,
+  token: Token
+): IStartPaymentAction => ({
+  type: START_PAYMENT_PROCESS,
+  payload: {
+    priceForStripe,
+    token,
+  },
 });
