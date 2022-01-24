@@ -1,41 +1,45 @@
-import { Action } from "redux";
-import { all, put, takeEvery, takeLatest, select } from "redux-saga/effects";
+import { put, takeEvery, takeLatest, select } from "redux-saga/effects";
 import { ICartItemsCollection, ICurrentUser, IItem } from "../../components/types";
 import { getCartItemsCollection, updateDBCart } from "../../firebase/firebase.utils";
 import { SIGN_OUT_SUCCESS } from "../user/user.types";
 import { selectCurrentUser } from "../user/user.selector";
 import { toast } from "react-toastify";
 import { selectCartItems } from "./cart.selectors";
-import { databaseCartItemToUpdate } from "./cart.utils";
+import { getNewCartItemCollectionObj } from "./cart.utils";
 import {
   clearCart,
   fetchCartFromDB,
+  IAddCartItemAction,
+  IDecreaseItemQty,
   IFetchCartFromDB,
+  IMoveCartToHistory,
+  IRemoveCartItemAction,
   updateCartFromDB,
 } from "./cart.actions";
-import {
-  ADD_CART_ITEM,
-  DECREASE_CART_ITEM_QTY,
-  FETCH_CART_FROM_DB,
-  REMOVE_CART_ITEM,
-  MOVE_CART_TO_HISTORY,
-} from "./cart.types";
+import * as Types from "./cart.types";
+import CustomError, { MODIFY_SHOPPING_CART_ERROR } from "../../utils/CustomError";
+import payCartSaga from "./cart.payment.saga";
 
 function* clearCartOnSignOut() {
   yield put(clearCart());
 }
 
-function* onSignOutSuccess() {
-  yield takeEvery(SIGN_OUT_SUCCESS, clearCartOnSignOut);
-}
-
-// this will modify the shopping cart both at the store and at the DB in a sync fashion
-function* modifyShoppingCart(action: Action) {
+/**
+ * Modifies the shopping cart both at the store and at the DB in a sync fashion
+ * @param action
+ */
+export function* modifyShoppingCart(
+  action:
+    | IAddCartItemAction
+    | IRemoveCartItemAction
+    | IDecreaseItemQty
+    | IMoveCartToHistory
+) {
   const currentCart: IItem[] = yield select(selectCartItems);
   const currentUser: ICurrentUser = yield select(selectCurrentUser);
-  const newCartItemCollection = databaseCartItemToUpdate(currentCart, action); // rename this
+  const newCartItemCollection = getNewCartItemCollectionObj(currentCart, action);
 
-  // modify only the cart items (not the history) at the redux store:
+  // Modify only the cart items (not the history) at the redux store:
   yield put(updateCartFromDB(newCartItemCollection.currentCart));
 
   if (currentUser) {
@@ -43,36 +47,52 @@ function* modifyShoppingCart(action: Action) {
       // update the DB only if the user is logged in
       // this will replace the DB `cartItem` collection with the object passed as parameter
       yield updateDBCart(currentUser.id, newCartItemCollection);
+      // yield new Promise((resolve, reject) => {
+      //   setTimeout(() => {
+      //     reject("some error");
+      //   }, 1500);
+      // });
     } catch {
-      toast.error("Error trying to modify the shopping cart. Please try again.");
+      // at the moment, paying a cart is the only action triggering a `MoveCartToHistory` action
+      const isPaymentProcess = action.type === Types.MOVE_CART_TO_HISTORY;
+      const errorMessage = isPaymentProcess ? "Payment Error: " : "";
+      toast.error(
+        `${errorMessage}Error trying to modify the shopping cart. Please try again.`
+      );
       // Revert the contents of the store on fail WITH the actual content of
       // the items in the DB: (I think this is very clever!)
       yield put(fetchCartFromDB(currentUser.id));
+
+      if (isPaymentProcess) {
+        throw new CustomError(
+          "Error trying to modify the shopping cart",
+          MODIFY_SHOPPING_CART_ERROR,
+          "Custom Error"
+        );
+      }
     }
   }
-}
-
-function* onCartChange() {
-  // it's better to take the latest modification to the DB (the saga will cancel
-  // the previous operation once it receives a new one): we don't need to modify
-  // the DB every time an item is modified; we just need the last one
-  yield takeLatest(
-    [ADD_CART_ITEM, DECREASE_CART_ITEM_QTY, REMOVE_CART_ITEM, MOVE_CART_TO_HISTORY],
-    modifyShoppingCart
-  );
 }
 
 // do the asynchronous call to fetch the user's cart
 function* fetchUserCart(action: IFetchCartFromDB) {
   const userId = action.payload;
+  // we can get the userId from the store!!! ---> this is something to modify!!
   const { currentCart }: ICartItemsCollection = yield getCartItemsCollection(userId);
   yield put(updateCartFromDB(currentCart));
 }
 
-function* onFetchCartFromDB() {
-  yield takeEvery(FETCH_CART_FROM_DB, fetchUserCart);
-}
-
 export default function* cartSagas() {
-  yield all([onSignOutSuccess(), onCartChange(), onFetchCartFromDB()]);
+  yield takeEvery(SIGN_OUT_SUCCESS, clearCartOnSignOut);
+  yield takeEvery(Types.FETCH_CART_FROM_DB, fetchUserCart);
+  yield takeEvery(Types.START_PAYMENT_PROCESS, payCartSaga);
+  yield takeLatest(
+    [
+      Types.ADD_CART_ITEM,
+      Types.DECREASE_CART_ITEM_QTY,
+      Types.REMOVE_CART_ITEM,
+      Types.MOVE_CART_TO_HISTORY,
+    ],
+    modifyShoppingCart
+  );
 }

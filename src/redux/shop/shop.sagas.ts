@@ -1,9 +1,9 @@
 import { call, put, takeEvery } from "redux-saga/effects";
 import { convertCollectionSnapshotToMap, firestore } from "../../firebase/firebase.utils";
-import { SnapshopType } from "../../firebase/firebase.types";
 import { FETCH_COLLECTIONS_START } from "./types";
 import { Collection, GenericError } from "../../components/types";
 import { addCollection, fetchCollectionError } from "./shop.actions";
+import { SnapshopType } from "../../firebase/firebase.types";
 
 function* fetchCollections() {
   try {

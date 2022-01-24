@@ -56,7 +56,7 @@ export const decreaseItemFromCart = (cartItem: IItem, cartItems: IItem[]) => {
 // this function returns the (cart) object that will be used to update
 // the `cartItems` collection at the database, THIS IS NOT A REDUCER:
 // refactor: I am not sure we really need this:
-export const databaseCartItemToUpdate = (
+export const getNewCartItemCollectionObj = (
   currentCart: IItem[],
   action:
     | IAddCartItemAction

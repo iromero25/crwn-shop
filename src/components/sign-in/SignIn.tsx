@@ -23,6 +23,7 @@ const SignIn: React.FC<Props> = ({ signInWithGoogle, signInWithEmail }) => {
       signInWithEmail(emailAndPassword);
       setEmailAndPassword({ email: "", password: "" });
     } catch (error) {
+      // we are not catching this when siginin in fails
       alert("Either email or password are wrong");
       console.log(error);
     }
