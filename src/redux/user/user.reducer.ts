@@ -13,11 +13,11 @@ import { CurrentUser, Error } from "../../components/types";
 
 export interface IUser {
   checkingUserSession: boolean;
-  currentUser: CurrentUser;
+  currentUser: CurrentUser; // should this be ICurrentUser instead?
   error: Error;
 }
 
-const initialState = {
+const initialState: IUser = {
   checkingUserSession: true,
   currentUser: null,
   error: null,
