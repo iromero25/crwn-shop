@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import firebase from "firebase/compat";
 
@@ -18,15 +18,26 @@ const CustomButton: React.FunctionComponent<Props> = ({
   isGoogleSignIn,
   inverted,
   ...otherProps
-}) => (
-  <button
-    className={`${inverted ? "inverted" : ""} ${
-      isGoogleSignIn ? "google-sign-in" : ""
-    } custom-button`}
-    {...otherProps}
-  >
-    {children}
-  </button>
-);
+}) => {
+  const [background, setBackground] = useState<string>("black");
+
+  // the only reasson I add functionality for the `onMouseEnter/Leave` events
+  // is to control the  backgroundColor  style of  my button  programatically
+  // (instead  of  relying on the css styling).  This is  the only way I know
+  // to test that a style is present in the button (see the related test)
+  return (
+    <button
+      onMouseEnter={() => setBackground("white")}
+      onMouseLeave={() => setBackground("black")}
+      style={{ backgroundColor: `${background}` }}
+      className={`${inverted ? "inverted" : ""} ${
+        isGoogleSignIn ? "google-sign-in" : ""
+      } custom-button`}
+      {...otherProps}
+    >
+      {children}
+    </button>
+  );
+};
 
 export default CustomButton;
