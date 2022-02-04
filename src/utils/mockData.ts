@@ -8,13 +8,29 @@ const mockCurrentUser: ICurrentUser = {
   email: "israel@gmail.com",
 };
 
-const currentCart: IItem = {
-  id: 1,
+export const dummyItem: IItem = {
+  id: 3,
   imageUrl: "someImageUrl",
   name: "Jacket",
   price: 45,
-  quantity: 1,
 };
+
+export const currentCartDummy: IItem[] = [
+  {
+    id: 1,
+    name: "Brown Brim",
+    imageUrl: "/images/shop-img/hats/brown-brim.png",
+    price: 25,
+    quantity: 2,
+  },
+  {
+    id: 2,
+    name: "Blue Beanie",
+    imageUrl: "/images/shop-img/hats/blue-beanie.png",
+    price: 18,
+    quantity: 1,
+  },
+];
 
 export const mockUser: IUser = {
   checkingUserSession: false,
@@ -24,5 +40,5 @@ export const mockUser: IUser = {
 
 export const mockCart: ICart = {
   isCartHidden: false,
-  cartItems: [currentCart],
+  cartItems: [dummyItem],
 };
