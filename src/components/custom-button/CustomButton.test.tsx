@@ -11,6 +11,9 @@ test("button has the CustomButton class initially", () => {
   expect(button).toBeInTheDocument();
   expect(button).toHaveClass("custom-button");
   expect(button).toHaveStyle({ backgroundColor: "black" });
+  expect(button).toHaveStyle({ color: "white" });
+
   fireEvent.mouseOver(button);
   expect(button).toHaveStyle({ backgroundColor: "white" });
+  expect(button).toHaveStyle({ color: "black" });
 });
