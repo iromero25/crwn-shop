@@ -25,33 +25,6 @@ const googleProvider = new firebase.auth.GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: "select_account" });
 export const signInWithGoogle = () => auth.signInWithPopup(googleProvider);
 
-export const createUserProfileDocument = async (
-  userAuth: FirebaseUser,
-  additionalData?: Record<string, any>
-) => {
-  if (!userAuth) return;
-
-  const userRef = firestore.doc(`users/${userAuth.uid}`);
-  const snapshot = await userRef.get();
-
-  if (!snapshot.exists) {
-    const { displayName, email } = userAuth;
-    const createdAt = new Date();
-    try {
-      await userRef.set({
-        displayName,
-        email,
-        createdAt,
-        ...additionalData,
-      });
-    } catch (error: any & { message: string }) {
-      console.log("error creating user", error.message);
-    }
-  }
-
-  return userRef;
-};
-
 export const getCartItemsCollection = async (
   userId: string
 ): Promise<ICartItemsCollection> => {

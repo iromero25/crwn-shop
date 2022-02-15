@@ -9,9 +9,10 @@
     "build": "react-scripts build && yarn build:server",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "dev": "concurrently --kill-others-on-fail \"yarn build:server\" \"yarn server\" \"yarn client\"",
+    "dev": "concurrently --kill-others-on-fail \"yarn build:server:watch\" \"yarn server\" \"yarn client\"",
     "server": "nodemon build/server",
-    "build:server": "tsc --watch -p tsconfig.server.json"
+    "build:server": "tsc -p tsconfig.server.json",
+    "build:server:watch": "tsc --watch -p tsconfig.server.json"
   },
   "eslintConfig": {
     "extends": [

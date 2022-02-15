@@ -8,9 +8,7 @@ export const paymentApi = (
 ) =>
   fetch("/payment", {
     method: "post",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       amount: priceForStripe,
       token: stripeToken,
@@ -26,3 +24,32 @@ export const paymentApi = (
         STRIPE_PAYMENT_ERROR
       );
     });
+
+export const getUserApi = (token: string) =>
+  fetch("/getUser", {
+    method: "get",
+    credentials: "include",
+    headers: { "Content-Type": "application/json", Authorization: token },
+  })
+    .then(response => (response.ok ? response.json() : new Error(response.statusText)))
+    .then(data => data)
+    .catch(error => console.log(`/getUser endpoint error: ${error.message} `));
+
+export const createUserApi = (
+  token: string,
+  displayName: string,
+  email: string,
+  additionalData?: Record<string, any>
+) =>
+  fetch("/createUser", {
+    method: "post",
+    headers: { "Content-Type": "application/json", Authorization: token },
+    body: JSON.stringify({
+      displayName,
+      email,
+      ...additionalData,
+    }),
+  })
+    .then(response => (response.ok ? response.json() : new Error(response.statusText)))
+    .then(data => data)
+    .catch(error => console.log(`/createUser endpoint error: ${error.message} `));
