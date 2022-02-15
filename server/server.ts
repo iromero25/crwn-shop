@@ -17,7 +17,7 @@ if (process.env.NODE_ENV !== "production") require("dotenv").config();
 
 // following line needs to be done after deciding how to load the .env
 // because that defines how we get stripe's secret key:
-const stripe = new Stripe(process.env.STRIPE_SECRET!, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2020-08-27",
 });
 
