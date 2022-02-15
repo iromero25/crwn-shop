@@ -17,7 +17,7 @@ if (process.env.NODE_ENV !== "production") require("dotenv").config();
 
 // following line needs to be done after deciding how to load the .env
 // because that defines how we get stripe's secret key:
-const stripe = new Stripe(process.env.STRIPE_SECRET!, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2020-08-27",
 });
 
@@ -28,13 +28,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // we serve the `index.html` file and all static files (including the bundles)
-// from the `build` folder ONLY WHEN IN PRODUCTION as there is no  need to do
-// this in development: create-react-app serves all the required files for us
+// from the current folder ONLY WHEN IN PRODUCTION as the server.js is created
+// inside the `buils` folder. For  development  there  is  no need to worry as
+// create-react-app serves all the required files for us
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "build")));
+  app.use(express.static(path.join(__dirname)));
 
   app.get("/", (_req, res) => {
-    res.sendFile(path.join(__dirname, "build", "index.html"));
+    res.sendFile(path.join(__dirname, "index.html"));
   });
 }
 

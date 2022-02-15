@@ -1,6 +1,11 @@
 import { Token } from "react-stripe-checkout";
 import CustomError, { STRIPE_PAYMENT_ERROR } from "../utils/CustomError";
 
+const baseUrl =
+  process.env.NODE_ENV !== "production"
+    ? ""
+    : `https://localhost.com:${process.env.NODE_ENV}`;
+
 export const paymentApi = (
   priceForStripe: number,
   stripeToken: Token,
@@ -26,7 +31,7 @@ export const paymentApi = (
     });
 
 export const getUserApi = (token: string) =>
-  fetch("/getUser", {
+  fetch(`${baseUrl}/getUser`, {
     method: "get",
     credentials: "include",
     headers: { "Content-Type": "application/json", Authorization: token },
