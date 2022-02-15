@@ -4,7 +4,7 @@
   "private": true,
   "proxy": "http://localhost:5000",
   "scripts": {
-    "start": "node server",
+    "start": "node build/server",
     "client": "react-scripts start",
     "build": "react-scripts build && yarn build:server",
     "test": "react-scripts test",
