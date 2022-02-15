@@ -1,9 +1,8 @@
 import firebase from "firebase/compat/app";
-import { all, put, takeEvery, select } from "redux-saga/effects";
+import { all, put, takeEvery, select, call } from "redux-saga/effects";
 import { GenericError, ICurrentUser, IItem } from "../../components/types";
 import {
   auth,
-  createUserProfileDocument,
   signInWithGoogle,
   getCurrentUser,
   addItemsIntoDBCurrentCart,
@@ -30,11 +29,8 @@ import {
   userIsAuthenticated,
   finishCheckUserSession,
 } from "./user.actions";
-import {
-  DocumentRefType,
-  DocumentSnapshotType,
-  FirebaseUser,
-} from "../../firebase/firebase.types";
+import { FirebaseUser } from "../../firebase/firebase.types";
+import { createUserApi, getUserApi } from "../../api/api";
 
 type AuthUserCredential = firebase.auth.UserCredential;
 
@@ -48,10 +44,13 @@ function* onUserAuthenticated(user: ICurrentUser) {
 // when signing in), instead, we just set the user in the store and fetch the items
 function* isUserAuthenticated() {
   try {
+    // this uses firebase to check if the user is authenticated, say on refreshing the page
     const userAuth: FirebaseUser = yield getCurrentUser();
     if (!userAuth) return;
-    const userSnapshot: DocumentSnapshotType = yield getSnapshotFromUserAuth(userAuth);
-    const user = { id: userSnapshot.id, ...userSnapshot.data() } as ICurrentUser;
+
+    const firebaseAuthToken: string = yield userAuth.getIdToken();
+    const user: ICurrentUser = yield call(getUserApi, firebaseAuthToken);
+    if (!user) throw Error("Authenticated firebase user does not exist on the database");
     yield onUserAuthenticated(user);
   } catch (error: GenericError) {
     yield put(signInFailed(error.message));
@@ -80,32 +79,28 @@ function* onSignOutStart() {
   yield takeEvery(SIGN_OUT_START, signOut);
 }
 
-function* getSnapshotFromUserAuthAndSignIn(
-  user: AuthUserCredential["user"],
+function* getUserFromDbAndSignIn(
+  user: NonNullable<AuthUserCredential["user"]>,
   additionalData?: Record<string, any>
 ) {
   try {
-    const userSnapshot: DocumentSnapshotType = yield getSnapshotFromUserAuth(
-      user,
-      additionalData
-    );
-    yield put(signInSuccess({ id: userSnapshot.id, ...userSnapshot.data() }));
-  } catch (error: GenericError) {
-    yield put(signInFailed(error.message));
-  }
-}
-
-function* getSnapshotFromUserAuth(
-  user: AuthUserCredential["user"],
-  additionalData?: Record<string, any>
-) {
-  try {
-    const userRef: DocumentRefType = yield createUserProfileDocument(
-      user,
-      additionalData
-    );
-    const userSnapshot: DocumentSnapshotType = yield userRef.get();
-    return userSnapshot;
+    const firebaseAuthToken: string = yield user.getIdToken();
+    let userData: ICurrentUser = yield call(getUserApi, firebaseAuthToken);
+    if (!userData) {
+      // I try to create a user in the DB here because the first time we sign in
+      // with a user that doesn't exist in the database we need to be sure to
+      // store it! This is not meant to happen several times, just every time
+      // we sign in with a new user (when we use an existing one, we don't hit)
+      // this line of code
+      userData = yield call(
+        createUserApi,
+        firebaseAuthToken,
+        user.displayName || "",
+        user.email || "",
+        additionalData
+      );
+    }
+    yield put(signInSuccess(userData));
   } catch (error: GenericError) {
     yield put(signInFailed(error.message));
   }
@@ -119,7 +114,8 @@ function* signInWithEmailAndPassword({
       email,
       password
     );
-    yield getSnapshotFromUserAuthAndSignIn(user);
+    if (!user) throw Error("Authenticated user is empty");
+    yield getUserFromDbAndSignIn(user);
   } catch (error: GenericError) {
     yield put(signInFailed(error.message));
   }
@@ -128,7 +124,8 @@ function* signInWithEmailAndPassword({
 function* signInWithGoogleSaga() {
   try {
     const { user }: AuthUserCredential = yield signInWithGoogle();
-    yield getSnapshotFromUserAuthAndSignIn(user);
+    if (!user) throw Error("Authenticated user is empty");
+    yield getUserFromDbAndSignIn(user);
   } catch (error: GenericError) {
     yield put(signInFailed(error.message));
   }
@@ -152,8 +149,10 @@ function* signUp(action: ISignUpStartAction) {
       email,
       password
     );
-    yield getSnapshotFromUserAuthAndSignIn(user, { displayName });
+    if (!user) throw Error("Authenticated user is empty");
+    yield getUserFromDbAndSignIn(user, { displayName });
   } catch (error: GenericError) {
+    // maybe show a toast? or al teast a message on the DOM?
     yield put(signUpFailure(error.message));
   }
 }
