@@ -1,0 +1,24 @@
+{
+  "name": "crwn-shop",
+  "description": "Single Page Application of a clothing coompany using the React library to generate the User Interface.",
+  "keywords": ["Crown Clothing", "crwn-shop"],
+  "website": "https://iromero-crwn-live.herokuapp.com/",
+  "repository": "https://github.com/iromero25/crwn-shop",
+  "env": {
+    "SECRET_TOKEN": {
+      "description": "A secret key for verifying the integrity of signed cookies.",
+      "generator": "secret"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "free"
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ]
+}
