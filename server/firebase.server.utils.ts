@@ -1,15 +1,11 @@
 import firebaseAdmin, { ServiceAccount } from "firebase-admin";
-//import serviceAccount from "./serviceAccountKey";
-//const serviceAccount = require("../serviceAccountKey.json");
 
 type DocumentData = firebaseAdmin.firestore.DocumentData;
 type DocumentReferenceType = firebaseAdmin.firestore.DocumentReference<DocumentData>;
 
 if (process.env.NODE_ENV !== "production") require("dotenv").config();
 
-const PRIVATE_KEY = process.env.FIREBASE_PRIVATE_KEY
-  ? process.env.FIREBASE_PRIVATE_KEY!.replace(/\\n/gm, "\n")
-  : "";
+const PRIVATE_KEY = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/gm, "\n") ?? "";
 
 firebaseAdmin.initializeApp({
   credential: firebaseAdmin.credential.cert({
@@ -25,7 +21,6 @@ firebaseAdmin.initializeApp({
     client_x509_cert_url:
       "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-61kos%40crwn-db-iromero.iam.gserviceaccount.com",
   } as ServiceAccount),
-  //credential: firebaseAdmin.credential.cert(JSON.parse(serviceAccount)),
 });
 
 export const getFirebaseUserRef = (userId: string): DocumentReferenceType =>

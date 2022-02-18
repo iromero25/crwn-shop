@@ -1,10 +1,6 @@
 import { Token } from "react-stripe-checkout";
 import CustomError, { STRIPE_PAYMENT_ERROR } from "../utils/CustomError";
 
-// TO DO: ho did Cory house solve this without relying on the proxy config @ package.json?
-// const baseUrl =
-//   process.env.NODE_ENV === "production" ? `https://iromero-crwn-live.herokuapp.com` : "";
-
 export const paymentApi = (
   priceForStripe: number,
   stripeToken: Token,
