@@ -14,19 +14,52 @@ jobs:
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
       - checkout
+      # look for existing cache and restore if found
+      - restore_cache:
+          key: v1-deps-{{ checksum "yarn.lock" }}
       - run:
-          name: "yarn install"
+          name: install dependencies
           command: yarn install
+      # save any changes to the cache
+      - save_cache:
+          key: v1-deps-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
       - run: CI=false yarn build
   test:
     docker:
       - image: cimg/node:12.16
     steps:
       - checkout
+      # look for existing cache and restore if found
+      - restore_cache:
+          key: v1-deps-{{ checksum "yarn.lock" }}
       - run:
-          name: "runnint tests"
+          name: install dependencies
           command: yarn install
       - run: yarn test
+  cypress:
+    docker:
+      - image: cypress/base:14.16.0
+    steps:
+      - checkout
+      # look for existing cache and restore if found
+      # I believe the `cypress` job has to specify its own cache  key 'cos  the
+      # docker image is different to that used by the other jobs (node-related)
+      # and thus, the cache is different (otherwise it won't work).
+      - restore_cache:
+          key: cypress-deps-{{ checksum "yarn.lock" }}
+      - run:
+          name: install dependencies
+          command: yarn install
+      # save any changes to the cache
+      - save_cache:
+          key: cypress-deps-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
+            - ~/.cache
+      - run:
+          command: yarn e2e:test
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
@@ -34,4 +67,7 @@ workflows:
   build_and_test:
     jobs:
       - build
-      - test
+      - test:
+          requires:
+            - build
+      - cypress
