@@ -6,11 +6,9 @@ describe("Dropdown Cart Items", () => {
   });
 
   it("droprown should be visible when the shopping icon is clicked", () => {
-    // this can be reused:
-    const s: string = "";
     cy.get(".cart-icon").should("be.visible");
     cy.get(".cart-dropdown").should("not.exist");
-    cy.get(".cart-icon").trigger("click").get(".cart-dropdown").should("be.visible");
+    cy.clickCartIcon();
   });
 
   it("button inside dropdown should change color when hovered", () => {
@@ -28,5 +26,7 @@ describe("Dropdown Cart Items", () => {
     cy.get(".cart-dropdown .custom-button")
       .realHover()
       .should("have.css", "background-color", whiteColor);
+
+    cy.get(".cart-icon").trigger("click"); // close the dropdown
   });
 });
