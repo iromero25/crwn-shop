@@ -1,24 +1,23 @@
 import Header from "./Header";
-import { Provider } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
-import configureMockStore from "redux-mock-store";
-import { render, screen } from "@testing-library/react";
-import { mockCart, mockUser } from "../../utils/mockData";
+import { screen } from "@testing-library/react";
+import { mockUser } from "../../utils/mockData";
+import { renderWithState } from "../../testUtils/renderWithState";
 
-const mockStore = configureMockStore();
+// mock the whole firebase utils as an empty function
+// (as I don't need to test writes to the DB!!)
+jest.mock("../../firebase/firebase.utils", () => jest.fn());
 
 test("All header links are shown", () => {
-  const store = mockStore({
+  const initialState = {
     user: mockUser,
-    cart: mockCart,
-  });
+  };
 
-  render(
-    <Provider store={store}>
-      <BrowserRouter>
-        <Header />
-      </BrowserRouter>
-    </Provider>
+  renderWithState(
+    <BrowserRouter>
+      <Header />
+    </BrowserRouter>,
+    initialState
   );
 
   const shopLink = screen.getByRole("link", { name: /shop/i });
