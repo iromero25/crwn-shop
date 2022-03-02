@@ -15,7 +15,7 @@ export interface IRouteParams {
 }
 
 const CollectionPage: React.FC = () => {
-  const { categoryId } = useParams<IRouteParams>(); // should we type it like this?
+  const { categoryId } = useParams<IRouteParams>(); // should it be typed like this?
   const collection = useSelector(selectCollection(categoryId));
   const { title, items } = collection;
 
