@@ -1,5 +1,5 @@
 import { IUser } from "../redux/user/user.reducer";
-import { Collection, ICart, ICurrentUser, IItem, IShopData } from "../components/types";
+import { ICart, ICurrentUser, IItem } from "../components/types";
 
 export const mockCurrentUser: ICurrentUser = {
   id: "abc",
@@ -13,6 +13,7 @@ export const dummyItem: IItem = {
   imageUrl: "someImageUrl",
   name: "Jacket",
   price: 45,
+  quantity: 1,
 };
 
 export const currentCartDummy: IItem[] = [
@@ -41,13 +42,4 @@ export const mockUser: IUser = {
 export const mockCart: ICart = {
   isCartHidden: false,
   cartItems: [dummyItem],
-};
-
-export const dummyCollection: Partial<Collection> = {
-  hats: {
-    id: 1,
-    title: "hats",
-    routeName: "hats",
-    items: currentCartDummy,
-  },
 };
