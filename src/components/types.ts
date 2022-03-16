@@ -33,6 +33,7 @@ export interface ICartItemsCollection {
 export interface ICart {
   isCartHidden: boolean;
   cartItems: IItem[];
+  isFetching: boolean;
 }
 
 export interface IShopData {

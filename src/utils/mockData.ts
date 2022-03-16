@@ -42,4 +42,5 @@ export const mockUser: IUser = {
 export const mockCart: ICart = {
   isCartHidden: false,
   cartItems: [dummyItem],
+  isFetching: false,
 };
