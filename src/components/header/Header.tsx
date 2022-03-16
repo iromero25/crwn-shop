@@ -19,6 +19,7 @@ interface ReduxProps extends ConnectedProps<typeof Connector> {}
 const Header: React.FC<ReduxProps> = ({
   currentUser,
   isCartHidden,
+  isShoppingCartFetching,
   checkingUserSession,
   signOutStart,
 }) => (
@@ -43,7 +44,7 @@ const Header: React.FC<ReduxProps> = ({
         </Link>
       )}
       <CartIconWithSpinner
-        isLoading={checkingUserSession}
+        isLoading={checkingUserSession || isShoppingCartFetching}
         widthOverlay={9}
         widthAndHeigth={18}
       />
@@ -56,6 +57,7 @@ const mapStateToProps = (state: Store) => ({
   checkingUserSession: state.user.checkingUserSession,
   currentUser: selectCurrentUser(state),
   isCartHidden: selectIsCartHidden(state),
+  isShoppingCartFetching: state.cart.isFetching,
 });
 
 const mapDispatchToProps = {

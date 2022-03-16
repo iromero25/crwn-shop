@@ -18,7 +18,6 @@ const SignIn: React.FC<Props> = ({ signInWithGoogle, signInWithEmail }) => {
 
   const handleSubmit = async (event: FormEvent<HTMLElement>) => {
     event.preventDefault();
-
     try {
       signInWithEmail(emailAndPassword);
       setEmailAndPassword({ email: "", password: "" });
