@@ -2,9 +2,43 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
+# This is an example on how to persist something to the next job
+# the documentation (and the example) can be found here:
+# https://circleci.com/docs/2.0/workspaces/
 jobs:
+  flow:
+    docker:
+      - image: cimg/node:12.16
+    steps:
+      - run: mkdir -p workspace
+      - run: echo "Hello, world!" > workspace/echo-output
+      # Persist the specified paths (workspace/echo-output) into the workspace for use in downstream job.
+      - persist_to_workspace:
+          # Must be an absolute path, or relative path from working_directory. This is a directory on the
+          # container which is taken to be the root directory of the workspace.
+          root: workspace
+          # Must be relative path from root
+          paths:
+            - . # path has to be specified. This persists the whole content of the `workspace` folder
+
+  # this job is the one cosuming the artifact that is made persistent by
+  # the previous `flow` job:
+  downstream:
+    docker:
+      - image: cimg/node:12.16
+    steps:
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at: workspace
+      - run: |
+          if [[ `cat workspace/echo-output` == "Hello, world!" ]]; then
+            echo "It worked!";
+          else
+            echo "Nope!"; exit 1
+          fi
+
+  # Define a job to be invoked later in a workflow.
+  # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
   build:
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
@@ -25,19 +59,14 @@ jobs:
           key: v1-deps-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
-      - run: CI=false yarn build
-  test:
-    docker:
-      - image: cimg/node:12.16
-    steps:
-      - checkout
-      # look for existing cache and restore if found
-      - restore_cache:
-          key: v1-deps-{{ checksum "yarn.lock" }}
-      - run:
-          name: install dependencies
-          command: yarn install
-      - run: yarn test
+      - run: CI=false yarn build && ls build
+      # this job will persist the  whole  content  of  the  `build` folder so it can be
+      # accessed by the `cypress` job: as a result of the `build` script, the server.js
+      # file is transpiled into the `build` folder
+      - persist_to_workspace:
+          root: build
+          paths:
+            - .
   cypress:
     docker:
       - image: cypress/base:14.16.0
@@ -58,6 +87,13 @@ jobs:
           paths:
             - node_modules
             - ~/.cache
+      # optional: in case I don't want to persist the content of the `build` folder
+      # into this job:
+      # - run: yarn build:server
+      - attach_workspace:
+          at: build
+      # this works because it starts the server that exists inside the `build` folder
+      # that was made persistent in the job this one depends upon
       - run:
           command: yarn e2e:test
 
@@ -66,8 +102,11 @@ jobs:
 workflows:
   build_and_test:
     jobs:
+      - flow
+      - downstream:
+          requires:
+            - flow
       - build
-      - test:
+      - cypress:
           requires:
             - build
-      - cypress
