@@ -14,9 +14,11 @@ export const paymentApi = (
       token: stripeToken,
     }),
   })
-    .then(_response => {
+    .then(({ ok, status }) => {
+      if (!ok || status >= 300) {
+        throw new Error();
+      }
       if (onSuccess) onSuccess();
-      // throw new Error();
     })
     .catch(() => {
       throw new CustomError(

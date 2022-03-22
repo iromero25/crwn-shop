@@ -4,7 +4,7 @@
   "private": true,
   "proxy": "http://localhost:5000",
   "scripts": {
-    "app": "npm-run-all --parallel server frontend",
+    "app": "npm-run-all --parallel start frontend",
     "build": "react-scripts build && yarn build:server",
     "build:server": "tsc -p tsconfig.server.json",
     "build:server:watch": "tsc --watch -p tsconfig.server.json",
